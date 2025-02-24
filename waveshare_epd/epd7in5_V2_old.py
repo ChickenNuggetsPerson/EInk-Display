@@ -263,6 +263,7 @@ class EPD:
             return -1
         # EPD hardware init start
         self.reset()
+        print("asdf")
         
         # self.send_command(0x06)     # btst
         # self.send_data(0x17)
