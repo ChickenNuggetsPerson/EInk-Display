@@ -10,8 +10,6 @@ Bfont = ImageFont.truetype('./Dangrek-Regular.ttf', 55, encoding="unic")
 Sfont = ImageFont.truetype('./Dangrek-Regular.ttf', 35, encoding="unic")
 mono = ImageFont.truetype('./Mono.ttf', 20, encoding="unic")
 
-#logging.basicConfig(level=logging.DEBUG)
-
 import openmeteo_requests
 
 import requests_cache
@@ -24,6 +22,8 @@ import io
 import math
 import matplotlib.pyplot as plt
 
+logging.basicConfig(level=logging.DEBUG)
+
 def main():
 
     image = genImage()
@@ -32,7 +32,7 @@ def main():
         image = image.save("out.jpg")
     else:
         
-        from waveshare_epd import epd7in5 as disp
+        from waveshare_epd import epd7in5_V2 as disp
         epd = disp.EPD()
         epd.init()
         #epd.Clear()
@@ -265,7 +265,7 @@ def makeDailyGraph(data):
         
     #     pass
 
-    print(data)
+    # print(data)
 
     today = datetime.today().date()
     df_today = data[data['date'].dt.date == today]

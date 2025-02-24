@@ -1,2 +1,5 @@
 lib/
 bin/
+out.jpg
+graph.png
+.cache.sqlite
