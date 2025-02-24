@@ -32,7 +32,7 @@ def main():
         image = image.save("out.jpg")
     else:
         
-        from waveshare_epd import epd7in5_V2 as disp
+        from waveshare_epd import epd7in5 as disp
         epd = disp.EPD()
         epd.init()
         #epd.Clear()
