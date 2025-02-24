@@ -47,8 +47,8 @@ def main():
 def genImage(width=800, height=480):
     Himage = Image.new('1', (width, height), 255)
 
-    data = getWeather()
-    Himage.paste(data)
+    # data = getWeather()
+    # Himage.paste(data)
 
     draw = ImageDraw.Draw(Himage)
 
