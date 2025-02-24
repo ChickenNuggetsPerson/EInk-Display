@@ -10,17 +10,10 @@ Bfont = ImageFont.truetype('./Dangrek-Regular.ttf', 55, encoding="unic")
 Sfont = ImageFont.truetype('./Dangrek-Regular.ttf', 35, encoding="unic")
 mono = ImageFont.truetype('./Mono.ttf', 20, encoding="unic")
 
-#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
-import openmeteo_requests
-
-import requests_cache
-import pandas as pd
-from retry_requests import retry
 
 from datetime import datetime
-
-import io
 
 def main():
 

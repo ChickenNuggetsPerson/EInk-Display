@@ -35,7 +35,6 @@ def main():
         from waveshare_epd import epd7in5_V2_old as disp
         epd = disp.EPD()
         epd.init()
-        print(3)
         #epd.Clear()
 
         epd.display(epd.getbuffer(image))
