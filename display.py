@@ -233,5 +233,6 @@ try:
     main()
 except KeyboardInterrupt:
     print("Ctrl-C Entered")
+    from waveshare_epd import epd7in5_V2 as disp
     disp.epdconfig.module_exit()
     sys.exit()
