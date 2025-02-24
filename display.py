@@ -8,7 +8,7 @@ import platform
 dir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 Bfont = ImageFont.truetype('./Dangrek-Regular.ttf', 55, encoding="unic")
 Sfont = ImageFont.truetype('./Dangrek-Regular.ttf', 35, encoding="unic")
-mono = ImageFont.truetype('./mono.ttf', 20, encoding="unic")
+mono = ImageFont.truetype('./Mono.ttf', 20, encoding="unic")
 
 #logging.basicConfig(level=logging.DEBUG)
 
