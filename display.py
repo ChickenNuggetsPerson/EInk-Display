@@ -10,7 +10,7 @@ Bfont = ImageFont.truetype('./Dangrek-Regular.ttf', 55, encoding="unic")
 Sfont = ImageFont.truetype('./Dangrek-Regular.ttf', 35, encoding="unic")
 mono = ImageFont.truetype('./Mono.ttf', 20, encoding="unic")
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 import openmeteo_requests
 
