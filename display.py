@@ -30,7 +30,7 @@ def main():
         image = image.save("out.jpg")
     else:
         
-        from waveshare_epd import epd7in5b_V2 as disp
+        from waveshare_epd import epd7in5_V2 as disp
         epd = disp.EPD()
         epd.init()
         #epd.Clear()
@@ -233,6 +233,6 @@ try:
     main()
 except KeyboardInterrupt:
     print("Ctrl-C Entered")
-    from waveshare_epd import epd7in5b_V2 as disp
+    from waveshare_epd import epd7in5_V2 as disp
     disp.epdconfig.module_exit()
     sys.exit()
