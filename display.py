@@ -21,6 +21,8 @@ from retry_requests import retry
 from datetime import datetime
 
 import io
+import math
+import matplotlib.pyplot as plt
 
 def main():
 
@@ -47,8 +49,8 @@ def main():
 def genImage(width=800, height=480):
     Himage = Image.new('1', (width, height), 255)
 
-    # data = getWeather()
-    # Himage.paste(data)
+    data = getWeather()
+    Himage.paste(data)
 
     draw = ImageDraw.Draw(Himage)
 
@@ -59,7 +61,7 @@ def genImage(width=800, height=480):
     draw.text((10, 0), day_name, 'black', Bfont)
     draw.text((10, 70), date_str, 'black', Sfont)
 
-    draw.line((10, 130, 300, 130), fill='black', width=3)
+    # draw.line((10, 130, 300, 130), fill='black', width=3)
 
     return Himage
 
@@ -80,7 +82,7 @@ def getWeather():
         "latitude": 41.0894,
         "longitude": 112.0647,
         "hourly": ["temperature_2m", "rain", "weather_code"],
-        "daily": ["weather_code", "precipitation_hours", "precipitation_probability_max"],
+        "daily": ["weather_code", "precipitation_probability_max", "temperature_2m_max", "temperature_2m_min"],
         "temperature_unit": "fahrenheit",
         "wind_speed_unit": "mph",
         "precipitation_unit": "inch",
@@ -114,8 +116,9 @@ def getWeather():
     # Process daily data. The order of variables needs to be the same as requested.
     daily = response.Daily()
     daily_weather_code = daily.Variables(0).ValuesAsNumpy()
-    daily_precipitation_hours = daily.Variables(1).ValuesAsNumpy()
-    daily_precipitation_probability_max = daily.Variables(2).ValuesAsNumpy()
+    daily_precipitation_probability_max = daily.Variables(1).ValuesAsNumpy()
+    daily_temperature_2m_max = daily.Variables(2).ValuesAsNumpy()
+    daily_temperature_2m_min = daily.Variables(3).ValuesAsNumpy()
 
     daily_data = {"date": pd.date_range(
         start = pd.to_datetime(daily.Time(), unit = "s", utc = True),
@@ -125,13 +128,12 @@ def getWeather():
     )}
 
     daily_data["weather_code"] = daily_weather_code
-    daily_data["precipitation_hours"] = daily_precipitation_hours
     daily_data["precipitation_probability_max"] = daily_precipitation_probability_max
+    daily_data["temperature_2m_max"] = daily_temperature_2m_max
+    daily_data["temperature_2m_min"] = daily_temperature_2m_min
 
     daily_dataframe = pd.DataFrame(data = daily_data)
     
-
-
 
 
 
@@ -139,22 +141,39 @@ def getWeather():
     Himage = Image.new('1', (800, 480), 255)
     draw = ImageDraw.Draw(Himage)
 
+
+    graph = makeDailyGraph(hourly_dataframe)
+    w = 400
+    graph = graph.resize((w, int((w / 5) * 3)))
+    Himage.paste(graph, (400, 10), graph)
+
+
     for index, row in daily_dataframe.iterrows():
 
         day = weekDayFromNum(row.iloc[0].weekday())
-        precipProb = row.iloc[2]
+        precipProb = round(row.iloc[2], 2)
+        temp_max = int(row.iloc[3])
+        temp_min = int(row.iloc[4])
+
+        draw.text((
+            (1.0 / 7.0) * index * 800 + 55, 
+            280
+        ), day, "black", Sfont, anchor="mm")
 
         draw.text((
             (1.0 / 7.0) * index * 800 + 55, 
             320
-        ), day, "black", Sfont, anchor="mm")
+        ), f"{temp_max}°", "black", mono, anchor="mm")
+
+        draw.text((
+            (1.0 / 7.0) * index * 800 + 55, 
+            320 + 25
+        ), f"{temp_min}°", "black", mono, anchor="mm")
 
         draw.text((
             (1.0 / 7.0) * index * 800 + 50, 
-            450
+            460
         ), f"{precipProb}%", "black", mono, anchor="mm")
-
-
 
 
         icon = Image.open(f"icons/pngs/{weatherImage(row.iloc[1])}")
@@ -162,9 +181,12 @@ def getWeather():
 
         Himage.paste(icon, (
             int((1.0 / 7.0) * index * 800 + 17), 
-            350
+            365
             ), icon
         )
+
+    draw.line((10, 250, 790, 250), fill='black', width=1)
+
 
     # return {
     #     "hourly": hourly_dataframe,
@@ -228,6 +250,48 @@ def weatherImage(x):
         return weather_codes[x] + ".png"
     else:
         return "Error"
+
+
+
+def makeDailyGraph(data):
+    
+    # Himage = Image.new('1', (800, 480), 255)
+    # draw = ImageDraw.Draw(Himage)
+
+    # for index, row in data.iterrows():
+        
+    #     print(row)
+    #     print()
+        
+    #     pass
+
+    print(data)
+
+    today = datetime.today().date()
+    df_today = data[data['date'].dt.date == today]
+
+    plt.figure(figsize=(5, 3))
+    plt.plot(df_today['date'], df_today['temperature_2m'], linestyle='-', color='b')
+    
+    plt.xlabel('')
+    plt.ylabel('')
+    plt.title('')
+    plt.xticks([])
+    plt.yticks([])
+    # for spine in plt.gca().spines.values():
+    #     spine.set_visible(False)
+
+    # Save the plot as an image
+    graph_path = "graph.png"
+    plt.savefig(graph_path)
+    plt.close()
+
+    # Open with Pillow
+    img = Image.open(graph_path)
+
+
+    return img
+
 
 try:
     main()
