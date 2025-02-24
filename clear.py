@@ -26,7 +26,7 @@ def main():
         epd = disp.EPD()
         epd.init()
         # epd.Clear()
-        epd.sleep()
+        # epd.sleep()
 
 
 
