@@ -96,7 +96,9 @@ class EPD:
         if (epdconfig.module_init() != 0):
             return -1
         # EPD hardware init start
+        print("aa")
         self.reset()
+        print("bb")
         
         self.send_command(0x06)     # btst
         self.send_data(0x17)
