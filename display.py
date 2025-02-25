@@ -1,4 +1,5 @@
 import sys
+from zoneinfo import ZoneInfo
 from PIL import Image, ImageDraw, ImageFont
 
 import logging
@@ -16,13 +17,14 @@ import requests_cache
 import pandas as pd
 from retry_requests import retry
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 import io
 import math
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 def main():
 
@@ -80,13 +82,13 @@ def getWeather():
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": 41.0894,
-        "longitude": 112.0647,
+        "longitude": 112.0647, 
         "hourly": ["temperature_2m", "rain", "weather_code"],
         "daily": ["weather_code", "precipitation_probability_max", "temperature_2m_max", "temperature_2m_min"],
         "temperature_unit": "fahrenheit",
         "wind_speed_unit": "mph",
         "precipitation_unit": "inch",
-        "timezone": "America/Denver"
+        # "timezone": "America/Denver"
     }
     responses = openmeteo.weather_api(url, params=params)
 
@@ -142,10 +144,10 @@ def getWeather():
     draw = ImageDraw.Draw(Himage)
 
 
-    graph = makeDailyGraph(hourly_dataframe)
-    w = 400
-    graph = graph.resize((w, int((w / 5) * 3)))
-    Himage.paste(graph, (400, 10), graph)
+    # graph = makeDailyGraph(hourly_dataframe)
+    # w = 400
+    # graph = graph.resize((w, int((w / 5) * 3)))
+    # Himage.paste(graph, (400, 10), graph)
 
 
     for index, row in daily_dataframe.iterrows():
@@ -265,19 +267,33 @@ def makeDailyGraph(data):
         
     #     pass
 
-    # print(data)
+    print(data)
 
-    today = datetime.today().date()
-    df_today = data[data['date'].dt.date == today]
+    # now = datetime.now(timezone.utc).astimezone(ZoneInfo("America/Denver"))
+    now = datetime.now(timezone.utc) + timedelta(hours=-8)
+    end = (now + timedelta(hours=24))
+    
+    data['date'] = pd.to_datetime(data['date'], utc=True)#.dt.tz_convert('America/Denver')
+    data = data[data['date'] < end]
 
     plt.figure(figsize=(5, 3))
-    plt.plot(df_today['date'], df_today['temperature_2m'], linestyle='-', color='b')
+    plt.plot(data['date'], data['temperature_2m'], linestyle='-', color='black')
     
     plt.xlabel('')
     plt.ylabel('')
     plt.title('')
-    plt.xticks([])
-    plt.yticks([])
+    
+
+
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%k %p'))
+    plt.xticks(pd.date_range(now, end, freq='4H'))
+
+    def custom_formatter(x, pos):
+        return f'{x}°' 
+    
+    plt.gca().yaxis.set_major_formatter(custom_formatter)
+
+
     # for spine in plt.gca().spines.values():
     #     spine.set_visible(False)
 
