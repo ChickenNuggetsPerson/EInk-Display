@@ -113,7 +113,7 @@ class EPD:
         print("aa")
         self.send_command(0x04) #POWER ON
         epdconfig.delay_ms(100)
-        self.ReadBusy()
+        # self.ReadBusy()
         print("bb")
 
         self.send_command(0X00)			#PANNEL SETTING
