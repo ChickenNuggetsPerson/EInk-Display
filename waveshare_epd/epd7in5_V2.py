@@ -111,7 +111,7 @@ class EPD:
         self.send_data(0x17)		#VDL=-15V
 
         self.send_command(0x04) #POWER ON
-        epdconfig.delay_ms(50)
+        epdconfig.delay_ms(100)
         self.ReadBusy()
 
         self.send_command(0X00)			#PANNEL SETTING

@@ -24,16 +24,16 @@ def main():
         from waveshare_epd import epd7in5_V2 as disp
 
         epd = disp.EPD()
-        print(1)
+        print("Class")
         
         epd.init()
-        print(2)
+        print("Init")
 
         epd.Clear()
-        print(3)
+        print("Clear")
 
         epd.sleep()
-        print(4)
+        print("Sleep")
 
 
 
