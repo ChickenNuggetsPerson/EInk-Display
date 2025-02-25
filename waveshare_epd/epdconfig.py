@@ -43,7 +43,7 @@ class RaspberryPi:
     RST_PIN  = 17
     DC_PIN   = 25
     CS_PIN   = 8
-    BUSY_PIN = 24
+    BUSY_PIN = 16
     PWR_PIN  = 18
     MOSI_PIN = 10
     SCLK_PIN = 11
@@ -83,17 +83,17 @@ class RaspberryPi:
             else:
                 self.GPIO_PWR_PIN.off()
 
-    # def digital_read(self, pin):
-    #     if pin == self.BUSY_PIN:
-    #         return self.GPIO_BUSY_PIN.value
-    #     elif pin == self.RST_PIN:
-    #         return self.RST_PIN.value
-    #     elif pin == self.DC_PIN:
-    #         return self.DC_PIN.value
-    #     # elif pin == self.CS_PIN:
-    #     #     return self.CS_PIN.value
-    #     elif pin == self.PWR_PIN:
-    #         return self.PWR_PIN.value
+    def digital_read(self, pin):
+        if pin == self.BUSY_PIN:
+            return self.GPIO_BUSY_PIN.value
+        elif pin == self.RST_PIN:
+            return self.RST_PIN.value
+        elif pin == self.DC_PIN:
+            return self.DC_PIN.value
+        # elif pin == self.CS_PIN:
+        #     return self.CS_PIN.value
+        elif pin == self.PWR_PIN:
+            return self.PWR_PIN.value
 
     def delay_ms(self, delaytime):
         time.sleep(delaytime / 1000.0)
