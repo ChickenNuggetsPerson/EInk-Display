@@ -84,6 +84,7 @@ class RaspberryPi:
                 self.GPIO_PWR_PIN.off()
 
     def digital_read(self, pin):
+        print("asdf")
         if pin == self.BUSY_PIN:
             return self.GPIO_BUSY_PIN.value
         elif pin == self.RST_PIN:
