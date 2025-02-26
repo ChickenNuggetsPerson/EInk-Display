@@ -92,11 +92,11 @@ async def getWeather():
 
 
     # Recomment back in
-    # currentCommand = """curl -s "https://wttr.in/Syracuse+Utah?0FQT" > data/current.txt """
-    # os.system(currentCommand)
+    currentCommand = """curl -s "https://wttr.in/Syracuse+Utah?0FQT" > data/current.txt """
+    os.system(currentCommand)
 
-    # dayCommand = """curl -s "https://wttr.in/Syracuse+Utah?1FQTn" > data/day.txt """
-    # os.system(dayCommand)
+    dayCommand = """curl -s "https://wttr.in/Syracuse+Utah?1FQTn" > data/day.txt """
+    os.system(dayCommand)
 
     # Read files
     f = open("data/current.txt", "r")
