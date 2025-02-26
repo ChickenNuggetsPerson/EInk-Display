@@ -30,7 +30,7 @@ import matplotlib.dates as mdates
 import asyncio
 import PIL.ImageOps  
 
-from mcstatus import JavaServer, BedrockServer
+# from mcstatus import JavaServer, BedrockServer
 
 # logging.basicConfig(level=logging.DEBUG)
 
