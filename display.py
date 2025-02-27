@@ -10,7 +10,7 @@ dir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 Bfont = ImageFont.truetype('./Dangrek-Regular.ttf', 55, encoding="unic")
 Mfont = ImageFont.truetype('./Dangrek-Regular.ttf', 45, encoding="unic")
 Sfont = ImageFont.truetype('./Dangrek-Regular.ttf', 35, encoding="unic")
-SSmono = ImageFont.truetype('./SourceCodePro-VariableFont_wght.ttf', 15, encoding="unic")
+SSmono = ImageFont.truetype('./SourceCodePro-VariableFont_wght.ttf', 18, encoding="unic")
 Smono = ImageFont.truetype('./SourceCodePro-VariableFont_wght.ttf', 20, encoding="unic")
 Mmono = ImageFont.truetype('./SourceCodePro-VariableFont_wght.ttf', 30, encoding="unic")
 Bmono = ImageFont.truetype('./SourceCodePro-VariableFont_wght.ttf', 40, encoding="unic")
@@ -67,14 +67,16 @@ async def genImage(width=800, height=480):
     now = datetime.now()
     day_name = now.strftime("%A")  # Full weekday name
     date_str = now.strftime("%B %d, %Y")
-    time_str = now.strftime("%R %p")
+    time_str = now.strftime("%I:%M %p")
 
-    draw.text((10, 80), day_name, 'black', subFont)
+    SSmono.set_variation_by_name("ExtraLight")
+
+    draw.text((15, 80), day_name, 'black', subFont)
     draw.text((10, 0), date_str, 'black', Bfont)
     draw.text((800, 5), "Refreshed at:", 'black', SSmono, anchor="rt")
     draw.text((790, 25), time_str, 'black', SSmono, anchor="rt")
 
-    draw.line((10, 130, 300, 130), fill='black', width=3)
+    # draw.line((10, 130, 300, 130), fill='black', width=2)
 
     return Himage
 
@@ -92,11 +94,18 @@ async def getWeather():
 
 
     # Recomment back in
-    currentCommand = """curl -s "https://wttr.in/Syracuse+Utah?0FQT" > data/current.txt """
-    os.system(currentCommand)
 
-    dayCommand = """curl -s "https://wttr.in/Syracuse+Utah?1FQTn" > data/day.txt """
-    os.system(dayCommand)
+    if (len(sys.argv) == 1):
+        print("Fetching Weather")
+
+        currentCommand = """curl -s "https://wttr.in/Syracuse+Utah?0FQT" > data/current.txt """
+        os.system(currentCommand)
+
+        dayCommand = """curl -s "https://wttr.in/Syracuse+Utah?1FQTn" > data/day.txt """
+        os.system(dayCommand)
+
+    else:
+        print("Skipping Weather Fetch")
 
     # Read files
     f = open("data/current.txt", "r")
@@ -109,7 +118,8 @@ async def getWeather():
 
 
     day = day.replace(current, "")
-    draw.text((400, 395), day, "black", SSmono, anchor="mm")
+    SSmono.set_variation_by_name("Regular")
+    draw.text((400, 240), day, "black", SSmono, anchor="mm")
 
     
     # server = "minecraft.steeleinnovations.com"
