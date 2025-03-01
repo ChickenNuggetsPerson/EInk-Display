@@ -134,7 +134,7 @@ def getCalendar(draw: ImageDraw.ImageDraw):
 
     draw.line((x - 10, y + 12, x + width - 25, y + 12), "black", 1)
 
-    subFont.set_variation_by_name("Regular")
+    subFont.set_variation_by_name("Bold")
 
     for day in days:
         draw.text((
@@ -143,6 +143,8 @@ def getCalendar(draw: ImageDraw.ImageDraw):
         ), day, "black", SSmono, anchor="mm")
 
         i += 1
+    
+    subFont.set_variation_by_name("Regular")
 
     for row in month:
         for day in row:
@@ -170,7 +172,7 @@ def getCalendar(draw: ImageDraw.ImageDraw):
 
             else:   
 
-                SSmono.set_variation_by_name("Light")
+                SSmono.set_variation_by_name("Regular")
 
             draw.text((
                 x + ( (i % 7) * ( 1 / 7 ) * width ), 
