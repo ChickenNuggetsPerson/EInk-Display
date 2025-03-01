@@ -113,8 +113,8 @@ def getWeather(draw: ImageDraw.ImageDraw):
 
 
     day = day.replace(current, "")
-    print(SSmono.get_variation_names())
-    SSmono.set_variation_by_name("Medium")
+    # print(SSmono.get_variation_names())
+    SSmono.set_variation_by_name("SemiBold")
     draw.text((400, 360), day, "black", SSmono, anchor="mm")
 
 def getCalendar(draw: ImageDraw.ImageDraw):
