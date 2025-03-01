@@ -30,6 +30,7 @@ import matplotlib.dates as mdates
 
 import PIL.ImageOps  
 import calendar
+import time
 
 from mcstatus import JavaServer, BedrockServer
 
@@ -92,6 +93,8 @@ def getWeather(draw: ImageDraw.ImageDraw):
 
         currentCommand = """curl -s "https://wttr.in/Syracuse+Utah?0FQT" > data/current.txt """
         os.system(currentCommand)
+
+        time.sleep(2)
 
         dayCommand = """curl -s "https://wttr.in/Syracuse+Utah?1FQTn" > data/day.txt """
         os.system(dayCommand)
