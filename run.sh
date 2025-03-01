@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 cd /home/hayden/EInk-Display
