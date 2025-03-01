@@ -113,7 +113,7 @@ def getWeather(draw: ImageDraw.ImageDraw):
 
 
     day = day.replace(current, "")
-    SSmono.set_variation_by_name("Regular")
+    SSmono.set_variation_by_name("Bold")
     draw.text((400, 360), day, "black", SSmono, anchor="mm")
 
 def getCalendar(draw: ImageDraw.ImageDraw):
