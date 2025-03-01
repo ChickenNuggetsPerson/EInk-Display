@@ -113,7 +113,8 @@ def getWeather(draw: ImageDraw.ImageDraw):
 
 
     day = day.replace(current, "")
-    SSmono.set_variation_by_name("Bold")
+    print(SSmono.get_variation_names())
+    SSmono.set_variation_by_name("Medium")
     draw.text((400, 360), day, "black", SSmono, anchor="mm")
 
 def getCalendar(draw: ImageDraw.ImageDraw):
@@ -134,7 +135,8 @@ def getCalendar(draw: ImageDraw.ImageDraw):
 
     draw.line((x - 10, y + 12, x + width - 25, y + 12), "black", 1)
 
-    subFont.set_variation_by_name("Bold")
+    # subFont.set_variation_by_name("Bold")
+    SSmono.set_variation_by_name("Bold")
 
     for day in days:
         draw.text((
@@ -143,8 +145,6 @@ def getCalendar(draw: ImageDraw.ImageDraw):
         ), day, "black", SSmono, anchor="mm")
 
         i += 1
-    
-    subFont.set_variation_by_name("Regular")
 
     for row in month:
         for day in row:
