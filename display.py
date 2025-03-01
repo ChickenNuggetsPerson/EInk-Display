@@ -94,28 +94,28 @@ def getWeather(draw: ImageDraw.ImageDraw):
         currentCommand = """curl -s "https://wttr.in/Syracuse+Utah?0FQT" > data/current.txt """
         os.system(currentCommand)
 
-        time.sleep(2)
+        # time.sleep(2)
 
-        dayCommand = """curl -s "https://wttr.in/Syracuse+Utah?1FQTn" > data/day.txt """
-        os.system(dayCommand)
+        # dayCommand = """curl -s "https://wttr.in/Syracuse+Utah?1FQTn" > data/day.txt """
+        # os.system(dayCommand)
 
     else:
         print("Skipping Weather Fetch")
 
     # Read files
-    f = open("data/current.txt", "r")
-    current = f.read()
-    f.close()
+    # f = open("data/current.txt", "r")
+    # current = f.read()
+    # f.close()
 
     f = open("data/day.txt", "r")
     day = f.read()
     f.close()
 
 
-    day = day.replace(current, "")
+    day = "\n".join(day.splitlines()[5:])
     # print(SSmono.get_variation_names())
     SSmono.set_variation_by_name("SemiBold")
-    draw.text((400, 360), day, "black", SSmono, anchor="mm")
+    draw.text((400, 350), day, "black", SSmono, anchor="mm")
 
 def getCalendar(draw: ImageDraw.ImageDraw):
 
