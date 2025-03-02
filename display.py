@@ -91,13 +91,13 @@ def getWeather(draw: ImageDraw.ImageDraw):
     if (len(sys.argv) == 1):
         print("Fetching Weather")
 
-        currentCommand = """curl -s "https://wttr.in/Syracuse+Utah?0FQT" > data/current.txt """
-        os.system(currentCommand)
+        # currentCommand = """curl -s "https://wttr.in/Syracuse+Utah?0FQT" > data/current.txt """
+        # os.system(currentCommand)
 
         # time.sleep(2)
 
-        # dayCommand = """curl -s "https://wttr.in/Syracuse+Utah?1FQTn" > data/day.txt """
-        # os.system(dayCommand)
+        dayCommand = """curl -s "https://wttr.in/Syracuse+Utah?1FQTn" > data/day.txt """
+        os.system(dayCommand)
 
     else:
         print("Skipping Weather Fetch")
