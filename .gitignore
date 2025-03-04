@@ -4,3 +4,5 @@ out.jpg
 graph.png
 .cache.sqlite
 data/*
+.env
+.DS_Store

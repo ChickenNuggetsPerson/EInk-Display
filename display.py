@@ -32,6 +32,10 @@ import PIL.ImageOps
 import calendar
 import time
 
+import requests
+import json
+from dotenv import load_dotenv
+
 from mcstatus import JavaServer, BedrockServer
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -64,7 +68,7 @@ def genImage(width=800, height=480):
     draw = ImageDraw.Draw(Himage)
     
     getCalendar(draw)
-    getWeather(draw)
+    getWeather(draw, Himage)
     getMCStatus(draw)
 
     now = datetime.now()
@@ -78,44 +82,61 @@ def genImage(width=800, height=480):
     draw.text((10, 0), date_str, 'black', Bfont)
     draw.line((10, 120, 300, 120), fill='black', width=2)
 
-    draw.text((5, 475), f"Refreshed at: {time_str}", 'black', SSmono, anchor="lb")
+    draw.text((1, 479), f"Refreshed at: {time_str}", 'black', SSmono, anchor="lb")
 
     return Himage
 
 
 
 
-def getWeather(draw: ImageDraw.ImageDraw):
+def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
     
 
     if (len(sys.argv) == 1):
         print("Fetching Weather")
 
-        # currentCommand = """curl -s "https://wttr.in/Syracuse+Utah?0FQT" > data/current.txt """
-        # os.system(currentCommand)
+        load_dotenv()  # Load environment variables from .env
 
-        # time.sleep(2)
+        apiKey = os.getenv("ACCUWEATHER_API_KEY")
+        locationKey = os.getenv("ACCUWEATHER_LOCATION_KEY")
+        url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{locationKey}?apikey={apiKey}"
 
-        dayCommand = """curl -s "https://wttr.in/Syracuse+Utah?1FQTn" > data/day.txt """
-        os.system(dayCommand)
+        apiData = requests.get(url).json()
+
+        with open("data/data.json", "w") as f:
+            json.dump(apiData, f, indent=4)
 
     else:
         print("Skipping Weather Fetch")
 
-    # Read files
-    # f = open("data/current.txt", "r")
-    # current = f.read()
-    # f.close()
+    # Read file
+    data = readJSON("data/data.json")
 
-    f = open("data/day.txt", "r")
-    day = f.read()
-    f.close()
+    # Screen width is 800
+    dx = 800 / 6
+    shift = dx / 2
+
+    index = -1
+    for hour in data[:6]: # Only do the next 6 hours
+        index += 1
+
+        time = datetime.fromisoformat(hour["DateTime"])
+        timestr = time.strftime("%l %p").strip()
+        draw.text((index * dx + shift, 285), timestr, "black", subSubFont, anchor="mm")
+
+        icon = getWeatherIcon(hour["WeatherIcon"])
+        image.paste(icon, (int(index * dx + 15), 310), icon)
+
+        temp = hour["Temperature"]["Value"]
+        draw.text((index * dx + shift, 426), f"{temp}°", "black", SSmono, anchor="mm")
+
+        if (hour["PrecipitationProbability"]):
+            prob = hour["PrecipitationProbability"]
+            draw.text((index * dx + shift, 445), f"{prob}%", "black", SSmono, anchor="mm")
 
 
-    day = "\n".join(day.splitlines()[5:])
-    # print(SSmono.get_variation_names())
-    SSmono.set_variation_by_name("SemiBold")
-    draw.text((400, 350), day, "black", SSmono, anchor="mm")
+
+
 
 def getCalendar(draw: ImageDraw.ImageDraw):
 
@@ -233,6 +254,44 @@ def getMCStatus(draw: ImageDraw.ImageDraw):
     else:
         draw.text((x + 140, y + 44), "Online", "black", subSubFont)
 
+
+
+
+
+def readJSON(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+        return data
+    except FileNotFoundError:
+        print(f"Error: File not found: {file_path}")
+        return None
+    except json.JSONDecodeError:
+        print(f"Error: Invalid JSON format in: {file_path}")
+        return None
+def getWeatherIcon(icon_code):
+    name = ""
+
+    if icon_code in [1, 2]:  # Sunny
+        name = "sunny.png"
+    elif icon_code in [3, 4, 5, 6]:  # Partly Cloudy
+        name = "cloudy_partial.png"
+    elif icon_code in [7, 8, 11]:  # Cloudy or Fog
+        name = "cloudy.png" if icon_code != 11 else "fog.png"
+    elif icon_code in [12, 13, 14, 26, 29]:  # Rain
+        name = "rain.png"
+    elif icon_code in [15, 16, 17, 18]:  # Thunderstorms
+        name = "thunder.png"
+    elif icon_code in [19, 20, 21, 22]:  # Snow
+        name = "snow.png"
+    elif icon_code in [23, 24, 25]:  # Rain and snow mix
+        name = "rain_partial.png"
+    else:
+        print("Code:", icon_code)
+        name = "cloudy_partial.png"
+
+    im = Image.open(f"icons/pngs/{name}")
+    return im.resize((100, 100), Image.Resampling.NEAREST)
 
 try:
     main()
