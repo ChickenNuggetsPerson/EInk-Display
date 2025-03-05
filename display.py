@@ -132,7 +132,9 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
 
         if (hour["PrecipitationProbability"]):
             prob = hour["PrecipitationProbability"]
-            draw.text((index * dx + shift, 445), f"{prob}%", "black", SSmono, anchor="mm")
+
+            if (prob >= 10):
+                draw.text((index * dx + shift, 445), f"{prob}%", "black", SSmono, anchor="mm")
 
 
 
