@@ -1,1 +1,0 @@
-for file in *.svg; do rsvg-convert "$file" -o "pngs/${file%.svg}.png"; done
