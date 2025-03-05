@@ -124,7 +124,7 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
         timestr = time.strftime("%l %p").strip()
         draw.text((index * dx + shift, 285), timestr, "black", subSubFont, anchor="mm")
 
-        icon = getWeatherIcon(hour["WeatherIcon"])
+        icon = getWeatherIcon(hour["WeatherIcon"], hour["IsDaylight"])
         image.paste(icon, (int(index * dx + 15), 310), icon)
 
         temp = hour["Temperature"]["Value"]
@@ -271,26 +271,50 @@ def readJSON(file_path):
     except json.JSONDecodeError:
         print(f"Error: Invalid JSON format in: {file_path}")
         return None
-def getWeatherIcon(icon_code):
+def getWeatherIcon(icon_code, isDaylight):
     name = ""
 
-    if icon_code in [1, 2]:  # Sunny
+    if icon_code in [1, 2, 3, 30]: 
         name = "sunny.png"
-    elif icon_code in [3, 4, 5, 6]:  # Partly Cloudy
-        name = "cloudy_partial.png"
-    elif icon_code in [7, 8, 11]:  # Cloudy or Fog
-        name = "cloudy.png" if icon_code != 11 else "fog.png"
-    elif icon_code in [12, 13, 14, 26, 29]:  # Rain
+
+    if icon_code in [33, 34, 35]:
+        name = "night.png"
+
+    elif icon_code in [4, 5, 6, 36, 37, 38]:  # Partly Cloudy
+        
+        if isDaylight:
+            name = "cloudy_partial.png"
+        else:
+            name = "cloudy_partial_night.png"
+
+    elif icon_code in [39, 40]:  # Partial Rain
+
+        if isDaylight:
+            name = "rain_partial.png"
+        else:
+            name = "rain_partial_night.png"
+
+    elif icon_code in [7, 8]:  # Cloudy
+        name = "cloudy.png"
+
+    elif icon_code in [11]: # Fog
+        name = "fog.png"
+
+    elif icon_code in [12, 13, 14, 18]:  # Rain
         name = "rain.png"
-    elif icon_code in [15, 16, 17, 18]:  # Thunderstorms
+
+    elif icon_code in [15, 16, 17, 41, 42]:  # Thunderstorms
         name = "thunder.png"
-    elif icon_code in [19, 20, 21, 22]:  # Snow
+
+    elif icon_code in [19, 20, 21, 22, 23, 24, 25, 26, 29, 31, 43, 44]:  # Snow
         name = "snow.png"
-    elif icon_code in [23, 24, 25]:  # Rain and snow mix
-        name = "rain_partial.png"
+
+    elif icon_code in [32]:  # Snow
+        name = "wind.png"
+
     else:
         print("Code:", icon_code)
-        name = "cloudy_partial.png"
+        name = "fog.png"
 
     im = Image.open(f"icons/pngs/{name}")
     return im.resize((100, 100), Image.Resampling.NEAREST)
