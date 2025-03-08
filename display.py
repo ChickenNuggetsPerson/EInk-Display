@@ -273,11 +273,11 @@ def readJSON(file_path):
         return None
 def getWeatherIcon(icon_code, isDaylight):
     name = ""
-
+    
     if icon_code in [1, 2, 3, 30]: 
         name = "sunny.png"
 
-    if icon_code in [33, 34, 35]:
+    elif icon_code in [33, 34, 35]:
         name = "night.png"
 
     elif icon_code in [4, 5, 6, 36, 37, 38]:  # Partly Cloudy
