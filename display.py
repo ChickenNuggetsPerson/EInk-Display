@@ -58,10 +58,6 @@ def main():
 
 
 
-
-
-
-
 def genImage(width=800, height=480):
     Himage = Image.new('1', (width, height), 255)
 
@@ -69,7 +65,7 @@ def genImage(width=800, height=480):
     
     getCalendar(draw)
     getWeather(draw, Himage)
-    getMCStatus(draw)
+    # getMCStatus(draw)
 
     now = datetime.now()
     day_name = now.strftime("%A")  # Full weekday name
@@ -82,7 +78,7 @@ def genImage(width=800, height=480):
     draw.text((10, 0), date_str, 'black', Bfont)
     draw.line((10, 120, 300, 120), fill='black', width=2)
 
-    draw.text((1, 479), f"Refreshed at: {time_str}", 'black', SSmono, anchor="lb")
+    draw.text((798, 2), time_str, 'black', SSmono, anchor="rt")
 
     return Himage
 
@@ -91,6 +87,7 @@ def genImage(width=800, height=480):
 
 def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
     
+    yPos = 300
 
     if (len(sys.argv) == 1):
         print("Fetching Weather")
@@ -122,31 +119,39 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
 
         time = datetime.fromisoformat(hour["DateTime"])
         timestr = time.strftime("%l %p").strip()
-        draw.text((index * dx + shift, 285), timestr, "black", subSubFont, anchor="mm")
+        draw.text((index * dx + shift, yPos), timestr, "black", subSubFont, anchor="mm")
 
         icon = getWeatherIcon(hour["WeatherIcon"], hour["IsDaylight"])
-        image.paste(icon, (int(index * dx + 15), 310), icon)
+        size = 100 - (index * 5)
+        pasteIcon(image, icon, index * dx + 65, yPos + 70, size, size)
 
         temp = hour["Temperature"]["Value"]
-        draw.text((index * dx + shift, 426), f"{temp}°", "black", SSmono, anchor="mm")
+        draw.text((index * dx + shift, yPos + 141 ), f"{temp}°", "black", SSmono, anchor="mm")
+
+        if (index != 0):
+            draw.line((index * dx, yPos + 5, index * dx, yPos + 145), fill="black", width=1)
 
         if (hour["PrecipitationProbability"]):
             prob = hour["PrecipitationProbability"]
 
             if (prob >= 10):
-                draw.text((index * dx + shift, 445), f"{prob}%", "black", SSmono, anchor="mm")
+                draw.text((index * dx + shift, yPos + 160), f"{prob}%", "black", SSmono, anchor="mm")
+            
 
 
+def pasteIcon(image: Image.Image, icon: Image.Image, x, y, sx, sy):
+    icon = icon.resize((int(sx), int(sy)))
+    image.paste(icon, ( int(x - (sx/2)), int(y - (sy/2)) ), icon)
 
 
 
 def getCalendar(draw: ImageDraw.ImageDraw):
 
-    x = 550
+    x = 530
     y = 40
 
-    width = 250
-    height = 170
+    width = 270
+    height = 190
 
     i = 0
 
@@ -180,11 +185,6 @@ def getCalendar(draw: ImageDraw.ImageDraw):
             if (day == today):
 
                 SSmono.set_variation_by_name("Bold")
-
-                # draw.circle((
-                #     x + ( (i % 7) * ( 1 / 7 ) * width ), 
-                #     y + ( (i // 7) * ( 1 / len(month) * height ) + 1)
-                # ), 15, "white", "black", 1)
 
                 draw.line(( 
                     x + ( (i % 7) * ( 1 / 7 ) * width ) - 10, 
@@ -316,8 +316,7 @@ def getWeatherIcon(icon_code, isDaylight):
         print("Code:", icon_code)
         name = "fog.png"
 
-    im = Image.open(f"icons/pngs/{name}")
-    return im.resize((100, 100), Image.Resampling.NEAREST)
+    return Image.open(f"icons/pngs/{name}")
 
 try:
     main()
