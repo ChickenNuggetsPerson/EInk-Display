@@ -159,16 +159,9 @@ def get_ssid():
     except:
         return "No SSID"
 
-def get_wifi_signal_strength():
-    try:
-        result = subprocess.check_output(["iw", "dev", "wlan0", "link"], text=True)
-        for line in result.splitlines():
-            if "signal:" in line:
-                signal_dbm = line.strip().split("signal:")[1].split()[0]
-                return f"{signal_dbm} dBm"
-        return ""
-    except:
-        return ""
+import socket
+def get_hostname(): 
+    return socket.gethostname().removesuffix(".local")
 
 def getNetwork(draw: ImageDraw.ImageDraw):
     x = 20
@@ -176,13 +169,13 @@ def getNetwork(draw: ImageDraw.ImageDraw):
 
     ip = get_local_ip()
     ssid = get_ssid()
-    strength = get_wifi_signal_strength()
+    hostname = get_hostname()
 
     draw.text((x, y), f"SSID:   {ssid}", "black", SSmono, anchor="lt")
-    y += 20
+    y += 22
+    draw.text((x, y), f"Host:   {hostname}", "black", SSmono, anchor="lt")
+    y += 22
     draw.text((x, y), f"IP:     {ip}", "black", SSmono, anchor="lt")
-    y += 20
-    draw.text((x, y), f"Signal: {strength}", "black", SSmono, anchor="lt")
 
 
 
@@ -194,7 +187,7 @@ def pasteIcon(image: Image.Image, icon: Image.Image, x, y, sx, sy):
 
 def getCalendar(draw: ImageDraw.ImageDraw):
 
-    x = 530
+    x = 520
     y = 40
 
     width = 270
