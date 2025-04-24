@@ -1,9 +1,8 @@
 import subprocess
 import sys
 from zoneinfo import ZoneInfo
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFont
 
-import logging
 import os
 import platform
 
@@ -24,14 +23,11 @@ from retry_requests import retry
 
 from datetime import datetime, timedelta, timezone
 
-import io
-import math
+
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-import PIL.ImageOps  
 import calendar
-import time
 
 import requests
 import json
@@ -39,8 +35,6 @@ from dotenv import load_dotenv
 
 from mcstatus import JavaServer, BedrockServer
 
-import icalendar
-import recurring_ical_events
 import requests
 
 # logging.basicConfig(level=logging.DEBUG)
