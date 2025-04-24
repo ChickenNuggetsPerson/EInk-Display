@@ -43,9 +43,10 @@ def main():
 
     load_dotenv()  # Load environment variables from .env
 
+    image = genImage()
+
     if (platform.system() == "Darwin"):
         
-        image = genImage()
         image = image.save("out.jpg")
 
     else:
@@ -53,14 +54,6 @@ def main():
         from waveshare_epd import epd7in5_V2 as disp
         epd = disp.EPD()
         epd.init()
-
-        # Show loading
-
-        loading = getLoadingImage()
-        epd.display_Partial(epd.getbuffer(loading), 250, 190, 550, 290)
-
-
-        image = genImage()
 
         epd.display(epd.getbuffer(image))
         epd.sleep()
@@ -92,14 +85,6 @@ def genImage(width=800, height=480):
 
     return Himage
 
-def getLoadingImage():
-    Himage = Image.new('1', (300, 100), 255)
-    draw = ImageDraw.Draw(Himage)
-
-    draw.rounded_rectangle((0, 0, 300, 100), 15, fill="black")
-    draw.text((150, 50), "Loading...", "white", subFont, anchor="mm")
-
-    return Himage
 
 def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
     
