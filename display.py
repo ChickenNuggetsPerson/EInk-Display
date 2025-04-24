@@ -33,8 +33,6 @@ import requests
 import json
 from dotenv import load_dotenv
 
-from mcstatus import JavaServer, BedrockServer
-
 import requests
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -67,7 +65,6 @@ def genImage(width=800, height=480):
     
     getCalendar(draw)
     getWeather(draw, Himage)
-    # getMCStatus(draw)
     getNetwork(draw)
 
     now = datetime.now()
@@ -177,13 +174,9 @@ def getNetwork(draw: ImageDraw.ImageDraw):
     y += 22
     draw.text((x, y), f"IP:     {ip}", "black", SSmono, anchor="lt")
 
-
-
 def pasteIcon(image: Image.Image, icon: Image.Image, x, y, sx, sy):
     icon = icon.resize((int(sx), int(sy)))
     image.paste(icon, ( int(x - (sx/2)), int(y - (sy/2)) ), icon)
-
-
 
 def getCalendar(draw: ImageDraw.ImageDraw):
 
@@ -241,64 +234,6 @@ def getCalendar(draw: ImageDraw.ImageDraw):
                 x + ( (i % 7) * ( 1 / 7 ) * width ), 
                 y + ( (i // 7) * ( 1 / len(month) * height ) )
             ), str(day), "black", SSmono, anchor="mm")
-
-def getMCStatus(draw: ImageDraw.ImageDraw):
-
-
-    x = 10
-    y = 200
-
-
-    jLatency = -1
-    bLatency = -1
-
-    try: 
-
-        ip = "minecraft.steeleinnovations.com"
-        jServer = JavaServer.lookup(ip)
-        bServer = BedrockServer.lookup(ip)
-
-        jLatency = round(jServer.status().latency, 1)
-        bLatency = round(bServer.status().latency, 1)
-    
-    except: 
-        pass
-
-    draw.text((x + 5, y + 5), "Java:", "black", subSubFont)
-    draw.text((x + 5, y + 40), "Bedrock:", "black", subSubFont)
-
-    if (jLatency == -1):
-        
-        draw.rectangle((
-            x + 130, 
-            y, 
-            x + 240, 
-            y + 37
-        ), "black")
-
-        draw.text((x + 140, y + 7), "Offline", "white", subSubFont)
-
-    else:
-        draw.text((x + 140, y + 7), "Online", "black", subSubFont)
-
-
-    if (bLatency == -1):
-        
-        draw.rectangle((
-            x + 130, 
-            y + 37, 
-            x + 240, 
-            y + 75
-        ), "black")
-
-        draw.text((x + 140, y + 44), "Offline", "white", subSubFont)
-
-    else:
-        draw.text((x + 140, y + 44), "Online", "black", subSubFont)
-
-
-
-
 
 def readJSON(file_path):
     try:
