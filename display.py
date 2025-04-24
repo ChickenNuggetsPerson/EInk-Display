@@ -1,3 +1,4 @@
+import subprocess
 import sys
 from zoneinfo import ZoneInfo
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -38,20 +39,34 @@ from dotenv import load_dotenv
 
 from mcstatus import JavaServer, BedrockServer
 
+import icalendar
+import recurring_ical_events
+import requests
+
 # logging.basicConfig(level=logging.DEBUG)
 
 def main():
 
-    image = genImage()
+    load_dotenv()  # Load environment variables from .env
 
     if (platform.system() == "Darwin"):
-        image = image.save("out.jpg")
-    else:
         
+        image = genImage()
+        image = image.save("out.jpg")
+
+    else:
+
         from waveshare_epd import epd7in5_V2 as disp
         epd = disp.EPD()
         epd.init()
-        #epd.Clear()
+
+        # Show loading
+
+        loading = getLoadingImage()
+        epd.display_Partial(epd.getbuffer(loading), 250, 190, 550, 290)
+
+
+        image = genImage()
 
         epd.display(epd.getbuffer(image))
         epd.sleep()
@@ -66,6 +81,7 @@ def genImage(width=800, height=480):
     getCalendar(draw)
     getWeather(draw, Himage)
     # getMCStatus(draw)
+    getNetwork(draw)
 
     now = datetime.now()
     day_name = now.strftime("%A")  # Full weekday name
@@ -82,26 +98,33 @@ def genImage(width=800, height=480):
 
     return Himage
 
+def getLoadingImage():
+    Himage = Image.new('1', (300, 100), 255)
+    draw = ImageDraw.Draw(Himage)
 
+    draw.rounded_rectangle((0, 0, 300, 100), 15, fill="black")
+    draw.text((150, 50), "Loading...", "white", subFont, anchor="mm")
 
+    return Himage
 
 def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
     
     yPos = 300
 
     if (len(sys.argv) == 1):
-        print("Fetching Weather")
+        try:
+            print("Fetching Weather")
 
-        load_dotenv()  # Load environment variables from .env
+            apiKey = os.getenv("ACCUWEATHER_API_KEY")
+            locationKey = os.getenv("ACCUWEATHER_LOCATION_KEY")
+            url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{locationKey}?apikey={apiKey}"
 
-        apiKey = os.getenv("ACCUWEATHER_API_KEY")
-        locationKey = os.getenv("ACCUWEATHER_LOCATION_KEY")
-        url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{locationKey}?apikey={apiKey}"
+            apiData = requests.get(url).json()
 
-        apiData = requests.get(url).json()
-
-        with open("data/data.json", "w") as f:
-            json.dump(apiData, f, indent=4)
+            with open("data/data.json", "w") as f:
+                json.dump(apiData, f, indent=4)
+        except:
+            print("Could not fetch weather")
 
     else:
         print("Skipping Weather Fetch")
@@ -122,7 +145,7 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
         draw.text((index * dx + shift, yPos), timestr, "black", subSubFont, anchor="mm")
 
         icon = getWeatherIcon(hour["WeatherIcon"], hour["IsDaylight"])
-        size = 100 - (index * 5)
+        size = 100 # - (index * 5)
         pasteIcon(image, icon, index * dx + 65, yPos + 70, size, size)
 
         temp = hour["Temperature"]["Value"]
@@ -137,6 +160,51 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
             if (prob >= 10):
                 draw.text((index * dx + shift, yPos + 160), f"{prob}%", "black", SSmono, anchor="mm")
             
+
+def get_local_ip():
+    import socket
+
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return "No IP"
+
+def get_ssid():
+    try:
+        result = subprocess.check_output(["iwgetid", "-r"], text=True)
+        return result.strip() if result.strip() else "No SSID"
+    except:
+        return "No SSID"
+
+def get_wifi_signal_strength():
+    try:
+        result = subprocess.check_output(["iw", "dev", "wlan0", "link"], text=True)
+        for line in result.splitlines():
+            if "signal:" in line:
+                signal_dbm = line.strip().split("signal:")[1].split()[0]
+                return f"{signal_dbm} dBm"
+        return ""
+    except:
+        return ""
+
+def getNetwork(draw: ImageDraw.ImageDraw):
+    x = 20
+    y = 145
+
+    ip = get_local_ip()
+    ssid = get_ssid()
+    strength = get_wifi_signal_strength()
+
+    draw.text((x, y), f"SSID:   {ssid}", "black", SSmono, anchor="lt")
+    y += 20
+    draw.text((x, y), f"IP:     {ip}", "black", SSmono, anchor="lt")
+    y += 20
+    draw.text((x, y), f"Signal: {strength}", "black", SSmono, anchor="lt")
+
 
 
 def pasteIcon(image: Image.Image, icon: Image.Image, x, y, sx, sy):
@@ -206,7 +274,7 @@ def getMCStatus(draw: ImageDraw.ImageDraw):
 
 
     x = 10
-    y = 140
+    y = 200
 
 
     jLatency = -1
@@ -320,7 +388,7 @@ def getWeatherIcon(icon_code, isDaylight):
 
 try:
     main()
-except KeyboardInterrupt:
+except:
     print("Ctrl-C Entered")
     from waveshare_epd import epd7in5_V2 as disp
     disp.epdconfig.module_exit()
