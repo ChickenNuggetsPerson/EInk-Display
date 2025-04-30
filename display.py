@@ -156,21 +156,14 @@ def get_ssid():
     except:
         return "No SSID"
 
-import socket
-def get_hostname(): 
-    return socket.gethostname().removesuffix(".local")
-
 def getNetwork(draw: ImageDraw.ImageDraw):
     x = 20
     y = 145
 
     ip = get_local_ip()
     ssid = get_ssid()
-    hostname = get_hostname()
 
     draw.text((x, y), f"SSID:   {ssid}", "black", SSmono, anchor="lt")
-    y += 22
-    draw.text((x, y), f"Host:   {hostname}", "black", SSmono, anchor="lt")
     y += 22
     draw.text((x, y), f"IP:     {ip}", "black", SSmono, anchor="lt")
 
