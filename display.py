@@ -83,6 +83,20 @@ def genImage(width=800, height=480):
     return Himage
 
 
+def fetchLocationData():
+
+    print("Location Key Changed, Fetching New Location Data")
+    apiKey = os.getenv("ACCUWEATHER_API_KEY")
+    locationKey = os.getenv("ACCUWEATHER_LOCATION_KEY")
+    url = f"http://dataservice.accuweather.com/locations/v1/{locationKey}?apikey={apiKey}"
+
+    apiData = requests.get(url).json()
+    with open("data/location.json", "w") as f:
+        json.dump({
+            "for": locationKey,
+            "data": apiData
+        }, f, indent=4)
+
 def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
     
     yPos = 300
@@ -105,8 +119,24 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
     else:
         print("Skipping Weather Fetch")
 
+
+    # Read location file
+    location = readJSON("data/location.json")
+    if (location is None):
+        fetchLocationData()
+        location = readJSON("data/location.json")
+    else:
+        if (location["for"] != os.getenv("ACCUWEATHER_LOCATION_KEY")):
+            fetchLocationData()
+            location = readJSON("data/location.json")
+
     # Read file
     data = readJSON("data/data.json")
+    
+
+    locationName = location["data"]["LocalizedName"] + ", " + location["data"]["AdministrativeArea"]["LocalizedName"]
+    draw.text((25, yPos - 35), locationName, "black", subSubFont, anchor="lb")
+    draw.line((20, yPos - 30, 25 + len(locationName) * 15, yPos - 30), fill="black", width=1)
 
     # Screen width is 800
     dx = 800 / 6
@@ -150,11 +180,15 @@ def get_local_ip():
         return "No IP"
 
 def get_ssid():
+
     try:
-        result = subprocess.check_output(["iwgetid", "-r"], text=True)
-        return result.strip() if result.strip() else "No SSID"
-    except:
-        return "No SSID"
+        # Linux
+        wifi_output = subprocess.check_output(["iwgetid", "-r"]).decode("utf-8")
+        return wifi_output.strip()
+
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return "Error Finding Wifi SSID" # Return an error message if none work
+    
 
 def getNetwork(draw: ImageDraw.ImageDraw):
     x = 20
