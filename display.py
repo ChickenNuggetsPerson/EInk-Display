@@ -183,9 +183,9 @@ def get_ssid():
 
     try:
         # Linux
-        wifi_output = subprocess.check_output(["iwgetid", "-r"]).decode("utf-8")
-        with open("data/wifiOut.txt", "w") as f:
-                f.write(wifi_output)
+        wifi_output = subprocess.check_output(["/usr/sbin/iwgetid", "-r"]).decode("utf-8")
+        with open("data/ssid.txt", "w") as f:
+                f.write(wifi_output.strip())
         return wifi_output.strip()
 
     except:
