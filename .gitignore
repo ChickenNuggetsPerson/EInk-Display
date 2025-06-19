@@ -6,3 +6,4 @@ graph.png
 data/*
 .env
 .DS_Store
+/waveshare_epd/__pycache__
