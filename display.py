@@ -184,9 +184,11 @@ def get_ssid():
     try:
         # Linux
         wifi_output = subprocess.check_output(["iwgetid", "-r"]).decode("utf-8")
+        with open("data/wifiOut.txt", "w") as f:
+                f.write(wifi_output)
         return wifi_output.strip()
 
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    except:
         return "Error Finding Wifi SSID" # Return an error message if none work
     
 
@@ -319,6 +321,9 @@ def getWeatherIcon(icon_code, isDaylight):
         name = "fog.png"
 
     return Image.open(f"icons/pngs/{name}")
+
+
+
 
 try:
     main()
