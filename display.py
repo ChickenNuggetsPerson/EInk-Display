@@ -61,7 +61,6 @@ def main():
 def genImage(width=800, height=480):
     Himage = Image.new('1', (width, height), 255)
 
-
     drawRandImage = True
 
     if drawRandImage:
@@ -69,26 +68,24 @@ def genImage(width=800, height=480):
 
     draw = ImageDraw.Draw(Himage)
     
+    now = datetime.now()
+    
     if (not drawRandImage):
         getCalendar(draw)
         getWeather(draw, Himage)
         getNetwork(draw)
     
+        day_name = now.strftime("%A")  # Full weekday name
+        date_str = now.strftime("%B %d, %Y")
 
-    now = datetime.now()
-    day_name = now.strftime("%A")  # Full weekday name
-    date_str = now.strftime("%B %d, %Y")
-    time_str = now.strftime("%I:%M %p")
+        SSmono.set_variation_by_name("ExtraLight")
 
-    SSmono.set_variation_by_name("ExtraLight")
-
-    draw.rounded_rectangle((5, 20, 10 + len(day_name) * 55, 120), radius=10, fill="white")
-    draw.text((15, 80), day_name, 'black', subFont)
-    draw.text((10, 0), date_str, 'black', Bfont)
-    
-    if (not drawRandImage):
+        draw.rounded_rectangle((5, 20, 10 + len(day_name) * 55, 120), radius=10, fill="white")
+        draw.text((15, 80), day_name, 'black', subFont)
+        draw.text((10, 0), date_str, 'black', Bfont)
         draw.line((10, 120, 300, 120), fill='black', width=2)
 
+    time_str = now.strftime("%I:%M %p")
     draw.text((798, 2), time_str, 'black', SSmono, anchor="rt")
 
     return Himage
