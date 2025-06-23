@@ -346,8 +346,8 @@ def fetchRandomImage():
 
 try:
     main()
-except:
-    print("Ctrl-C Entered")
+except Exception as e:
+    print(f"Error: {e}")
     from waveshare_epd import epd7in5_V2 as disp
     disp.epdconfig.module_exit()
     sys.exit()
