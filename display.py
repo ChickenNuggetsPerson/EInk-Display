@@ -61,7 +61,7 @@ def main():
 def genImage(width=800, height=480):
     Himage = Image.new('1', (width, height), 255)
 
-    drawRandImage = True
+    drawRandImage = False
 
     if drawRandImage:
         Himage = fetchRandomImage()
@@ -69,7 +69,7 @@ def genImage(width=800, height=480):
     draw = ImageDraw.Draw(Himage)
     
     now = datetime.now()
-    
+
     if (not drawRandImage):
         getCalendar(draw)
         getWeather(draw, Himage)
@@ -233,7 +233,6 @@ def getCalendar(draw: ImageDraw.ImageDraw):
 
     draw.line((x - 10, y + 12, x + width - 25, y + 12), "black", 1)
 
-    # subFont.set_variation_by_name("Bold")
     SSmono.set_variation_by_name("Bold")
 
     for day in days:
@@ -243,6 +242,9 @@ def getCalendar(draw: ImageDraw.ImageDraw):
         ), day, "black", SSmono, anchor="mm")
 
         i += 1
+
+    if (month[0].count(0) == 6):
+        i -= 7
 
     for row in month:
         for day in row:
