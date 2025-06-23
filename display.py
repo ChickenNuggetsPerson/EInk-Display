@@ -63,9 +63,12 @@ def genImage(width=800, height=480):
 
     draw = ImageDraw.Draw(Himage)
     
-    getCalendar(draw)
-    getWeather(draw, Himage)
-    getNetwork(draw)
+    # getCalendar(draw)
+    # getWeather(draw, Himage)
+    # getNetwork(draw)
+
+    Himage = fetchRandomImage()
+    # Himage.paste(im)
 
     now = datetime.now()
     day_name = now.strftime("%A")  # Full weekday name
@@ -322,6 +325,14 @@ def getWeatherIcon(icon_code, isDaylight):
 
     return Image.open(f"icons/pngs/{name}")
 
+def fetchRandomImage(): 
+    response = requests.get("https://picsum.photos/800/480")
+    with open("data/image.png", "wb") as f:
+        f.write(response.content)
+
+    image = Image.open("data/image.png").convert("L", dither=Image.Dither.FLOYDSTEINBERG)  # Convert to grayscale
+    image = image.convert("1")
+    return image
 
 
 
