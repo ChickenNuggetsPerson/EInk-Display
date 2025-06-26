@@ -41,12 +41,19 @@ def main():
 
     load_dotenv()  # Load environment variables from .env
 
-    image = genImage()
+    image
+
+    if (len(sys.argv) > 0):
+        if (validFilePath(sys.argv[0])):
+            image = Image.open(sys.argv[0])
+            image = image.convert("1")
+        else:
+            image = genImage()
+    else:
+        image = genImage()
 
     if (platform.system() == "Darwin"):
-        
         image = image.save("out.jpg")
-
     else:
 
         from waveshare_epd import epd7in5_V2 as disp
@@ -57,6 +64,18 @@ def main():
         epd.sleep()
 
 
+def validFilePath(path_string: str):
+    if (not path_string.endswith(".png")):
+        return False
+    
+    if os.path.exists(path_string):
+        if os.path.isfile(path_string):
+            return True
+        else:
+            return False
+    else:
+        return False
+    
 
 def genImage(width=800, height=480):
     Himage = Image.new('1', (width, height), 255)

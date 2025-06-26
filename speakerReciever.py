@@ -167,24 +167,9 @@ def display(metadata):
     load_dotenv()  # Load environment variables from .env
 
     image = genImage(metadata)
-
-    if (platform.system() == "Darwin"):
-
-        image = image.save("out.jpg")
-
-    else:
-        try:
-            from waveshare_epd import epd7in5_V2 as disp
-            epd = disp.EPD()
-            epd.init()
-            epd.display(epd.getbuffer(image))
-            epd.sleep()
-            disp.epdconfig.module_exit(cleanup=True)
-        except Exception as e:
-            print(f"Error: {e}")
-            from waveshare_epd import epd7in5_V2 as disp
-            disp.epdconfig.module_exit()
-            sys.exit()
+    image = image.save("./data/music.png")
+    print(" - Saved image - ")
+    subprocess.run(["python3", "display.py", "./data/music.png"])
 
 
 if __name__ == "__main__":
