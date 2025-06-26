@@ -109,10 +109,10 @@ def genImage(metadata):
     width = 100
     height = 100
 
-    Himage = Image.new('1', (width, height), 255)
+    Himage = Image.new('1', (width, height), 255, color="black")
     draw = ImageDraw.Draw(Himage)
 
-    draw.text((10, 10), metadata["title"], "black", Sfont, anchor="lt")
+    draw.text((10, 10), metadata["title"], "white", Sfont, anchor="lt")
 
     return Himage
 
@@ -130,9 +130,9 @@ def display(metadata):
         from waveshare_epd import epd7in5_V2 as disp
         epd = disp.EPD()
         epd.init()
-
         epd.display_Partial(epd.getbuffer(image), 0, 0, image.width, image.height)
         epd.sleep()
+        print("Image Displayed")
 
 
 if __name__ == "__main__":
