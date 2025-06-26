@@ -43,11 +43,13 @@ def main():
     load_dotenv()  # Load environment variables from .env
 
     image = None
+    fastMode = False
 
     if (len(sys.argv) > 1):
         if (validFilePath(sys.argv[1])):
             image = Image.open(sys.argv[1])
             image = image.convert("1")
+            fastMode = True
         else:
             image = genImage()
     else:
@@ -59,7 +61,11 @@ def main():
 
         from waveshare_epd import epd7in5_V2 as disp
         epd = disp.EPD()
-        epd.init()
+        
+        if (fastMode):
+            epd.init_fast()
+        else: 
+            epd.init()
 
         epd.display(epd.getbuffer(image))
         epd.sleep()
