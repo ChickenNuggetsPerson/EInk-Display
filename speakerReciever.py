@@ -50,7 +50,7 @@ def main():
 
                 # Save image
                 if metadata.get("cover_art_file") and image_data:
-                    filename = IMAGE_SAVE_DIR / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{metadata['cover_art_file']}"
+                    filename = IMAGE_SAVE_DIR / f"cover.jpg"
                     with open(filename, 'wb') as f:
                         f.write(image_data)
                     metadata["cover_art_file"] = str(filename)

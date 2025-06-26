@@ -62,7 +62,7 @@ def handle_binary_packet(data):
 def save_cover_art():
     if not cover_art_data:
         return None
-    filename = ART_DIR / f"cover_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+    filename = ART_DIR / f"cover.jpg"
     with open(filename, 'wb') as f:
         f.write(cover_art_data)
     return filename
@@ -87,7 +87,7 @@ def send_metadata(data):
             sock.sendall(json_payload)
             sock.sendall(image_data)
 
-        print(f"✅ Sent metadata and image to {REMOTE_HOST}:{REMOTE_PORT}")
+        print(f"Sent metadata to {REMOTE_HOST}:{REMOTE_PORT}")
     except Exception as e:
         print(f"[!] Failed to send metadata: {e}")
 
