@@ -62,7 +62,7 @@ def handle_text_packet(text):
             send_timer.cancel()
 
         # Delay sending to give image time to arrive
-        send_timer = threading.Timer(0.5, delayed_send)
+        send_timer = threading.Timer(0.0, delayed_send)
         send_timer.start()
 
 def delayed_send():
