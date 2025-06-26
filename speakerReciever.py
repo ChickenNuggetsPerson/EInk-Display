@@ -179,7 +179,7 @@ def display(metadata):
             epd.init()
             epd.display(epd.getbuffer(image))
             epd.sleep()
-            disp.epdconfig.module_exit()
+            disp.epdconfig.module_exit(cleanup=True)
         except Exception as e:
             print(f"Error: {e}")
             from waveshare_epd import epd7in5_V2 as disp
