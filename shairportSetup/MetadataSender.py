@@ -74,6 +74,9 @@ import struct
 def send_metadata(data):
     global last_sent_metadata
 
+    if not data.get("cover_art_file"):
+        return
+
     minimal = {k: data.get(k) for k in ("title", "artist", "album")}
 
     if minimal == last_sent_metadata:
