@@ -42,7 +42,7 @@ def main():
 
     load_dotenv()  # Load environment variables from .env
 
-    image
+    image = None
 
     if (len(sys.argv) > 0):
         if (validFilePath(sys.argv[0])):
