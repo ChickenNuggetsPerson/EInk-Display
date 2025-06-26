@@ -1,0 +1,12 @@
+    [Unit]
+    Description=Metadata reciever for EInk-Display
+    After=network.target
+
+    [Service]
+    ExecStart=/home/hayden/EInk-Display/speakerReciever.py
+    WorkingDirectory=/home/hayden/EInk-Display
+    Restart=always
+    User=hayden
+
+    [Install]
+    WantedBy=multi-user.target
