@@ -106,8 +106,8 @@ def main():
 
 def genImage(metadata):
 
-    width = 100
-    height = 100
+    width = 270
+    height = 190
 
     Himage = Image.new('1', (width, height), 255)
     draw = ImageDraw.Draw(Himage)
@@ -129,8 +129,9 @@ def display(metadata):
         try:
             from waveshare_epd import epd7in5_V2 as disp
             epd = disp.EPD()
+            epd.init()
             epd.init_part()
-            epd.display_Partial(epd.getbuffer(image), 0, 0, image.width, image.height)
+            epd.display_Partial(epd.getbuffer(image), 520, 40, image.width, image.height)
             epd.sleep()
             print("Image Displayed")
         except Exception as e:
