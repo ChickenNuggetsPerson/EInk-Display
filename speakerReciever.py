@@ -109,10 +109,10 @@ def genImage(metadata):
     width = 100
     height = 100
 
-    Himage = Image.new('1', (width, height), 255, color="black")
+    Himage = Image.new('1', (width, height), 255)
     draw = ImageDraw.Draw(Himage)
 
-    draw.text((10, 10), metadata["title"], "white", Sfont, anchor="lt")
+    draw.text((10, 10), metadata["title"], "black", Sfont, anchor="lt")
 
     return Himage
 
