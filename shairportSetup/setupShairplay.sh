@@ -92,3 +92,10 @@ sudo make install
 echo Done compiling and installing metadata reader...
 
 cd
+
+wget https://raw.githubusercontent.com/ChickenNuggetsPerson/EInk-Display/refs/heads/main/shairportSetup/shairport-sync.conf
+wget https://raw.githubusercontent.com/ChickenNuggetsPerson/EInk-Display/refs/heads/main/shairportSetup/MetadataSender.py
+
+echo 
+echo Please copy shairport config file into /etc/shairport-sync.conf
+echo Metadata sender script can be found in the MetadataSender.py file.
