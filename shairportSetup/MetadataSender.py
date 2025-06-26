@@ -125,7 +125,7 @@ def send_metadata(data):
             sock.sendall(json_payload)
             sock.sendall(image_data)
 
-        print(f"Sent metadata to {REMOTE_HOST}:{REMOTE_PORT}")
+        print(f"Sent metadata to {REMOTE_HOST}:{REMOTE_PORT} - {metadata["title"]}")
     except Exception as e:
         print(f"[!] Failed to send metadata: {e}")
 

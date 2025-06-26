@@ -43,6 +43,7 @@ import json
 import struct
 from datetime import datetime
 from pathlib import Path
+import traceback
 
 HOST = "0.0.0.0"
 PORT = 6000
@@ -102,17 +103,23 @@ def main():
 
             except Exception as e:
                 print(f"[!] Error: {e}")
+                traceback.print_exc()
 
 
 def genImage(metadata):
 
-    width = 270
+    width = 300
     height = 190
 
     Himage = Image.new('1', (width, height), 255)
     draw = ImageDraw.Draw(Himage)
 
     draw.text((10, 10), metadata["title"], "black", Sfont, anchor="lt")
+
+    cover = Image.open("./data/received_covers/cover.jpg")
+    cover = cover.resize((170, 170))
+    cover = cover.convert("1")
+    Himage.paste(cover, ( 120, 10, 290, 180 ))
 
     return Himage
 
@@ -131,7 +138,7 @@ def display(metadata):
             epd = disp.EPD()
             epd.init()
             epd.init_part()
-            epd.display_Partial(epd.getbuffer(image), 520, 40, image.width, image.height)
+            epd.display_Partial(epd.getbuffer(image), 490, 40, int(image.width), int(image.height))
             epd.sleep()
             print("Image Displayed")
         except Exception as e:
