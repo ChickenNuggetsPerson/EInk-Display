@@ -29,6 +29,7 @@ ART_DIR = Path("/tmp/shairport-art")
 ART_DIR.mkdir(parents=True, exist_ok=True)
 
 def reset_metadata():
+    print("Reset")
     global metadata, cover_art_data, received_picture
     metadata = {}
     cover_art_data = bytearray()
