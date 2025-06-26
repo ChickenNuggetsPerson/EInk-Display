@@ -74,7 +74,7 @@ def send_metadata(data):
     try:
 
         global prevData
-        if data == prevData:
+        if data["title"] == prevData["title"] and data["artist"] == prevData["artist"] and data["album"] == prevData["album"]:
             return
         else:
             prevData = data
