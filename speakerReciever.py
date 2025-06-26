@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import subprocess
 import sys
 from zoneinfo import ZoneInfo
@@ -110,7 +112,7 @@ def genImage(metadata):
     Himage = Image.new('1', (width, height), 255)
     draw = ImageDraw.Draw(Himage)
 
-    draw.text((10, 10), metadata["title"], "black", SSmono, anchor="lt")
+    draw.text((10, 10), metadata["title"], "black", Sfont, anchor="lt")
 
     return Himage
 
