@@ -130,7 +130,7 @@ def display(metadata):
             from waveshare_epd import epd7in5_V2 as disp
             epd = disp.EPD()
             epd.init()
-            epd.display_Partial(epd.getbuffer(image), 0, 0, image.width, image.height)
+            epd.display_Partial(epd.getbuffer(image), 0, 0, epd.width, epd.height)
             epd.sleep()
             print("Image Displayed")
         except Exception as e:
