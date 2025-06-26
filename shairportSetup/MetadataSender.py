@@ -22,43 +22,37 @@ FIELD_MAP = {
 }
 
 metadata = {}
+last_sent_metadata = {}
+
 cover_art_data = bytearray()
 received_picture = False
 
 ART_DIR = Path("/tmp/shairport-art")
 ART_DIR.mkdir(parents=True, exist_ok=True)
 
+
 def reset_metadata():
-    print("Reset")
     global metadata, cover_art_data, received_picture
     metadata = {}
     cover_art_data = bytearray()
     received_picture = False
 
 def handle_text_packet(text):
-    global metadata  # just for clarity
-    lines = text.splitlines()
-    saw_end = False
-
-    for line in lines:
+    for line in text.splitlines():
         if line.startswith("ssncmden"):
-            saw_end = True
-            continue  # don't parse further
+            # End of metadata — save and send
+            image_file = save_cover_art() if received_picture else None
+            if image_file:
+                metadata["cover_art_file"] = str(image_file)
+
+            if all(k in metadata for k in ("title", "artist", "album")):
+                send_metadata(metadata)
+
+            reset_metadata()
 
         for prefix, key in FIELD_MAP.items():
             if line.startswith(prefix):
                 metadata[key] = line[len(prefix):].strip()
-
-    if saw_end:
-        image_file = save_cover_art() if received_picture else None
-        if image_file:
-            metadata["cover_art_file"] = str(image_file)
-
-        if all(k in metadata for k in ("title", "artist", "album")):
-            send_metadata(metadata)
-
-        reset_metadata()
-
 
 def handle_binary_packet(data):
     global received_picture, cover_art_data
@@ -78,20 +72,28 @@ def save_cover_art():
 
 import struct
 def send_metadata(data):
-    try:
+    global last_sent_metadata
 
+    minimal = {k: data.get(k) for k in ("title", "artist", "album")}
+
+    if minimal == last_sent_metadata:
+        print("Duplicate metadata — skipping send")
+        return
+
+    last_sent_metadata = minimal.copy()
+
+    try:
         cover_path = data.get("cover_art_file")
         image_data = b''
         if cover_path and os.path.exists(cover_path):
             with open(cover_path, 'rb') as f:
                 image_data = f.read()
-        # Remove local image path 
+
+        # Clean up the payload for transmission
         data["cover_art_file"] = os.path.basename(cover_path) if cover_path else None
 
         json_payload = json.dumps(data, ensure_ascii=False).encode('utf-8')
-        json_len = struct.pack('>I', len(json_payload))  # 4-byte big endian
-
-        print(json_payload)
+        json_len = struct.pack('>I', len(json_payload))
 
         with socket.create_connection((REMOTE_HOST, REMOTE_PORT), timeout=2) as sock:
             sock.sendall(json_len)
@@ -101,6 +103,7 @@ def send_metadata(data):
         print(f"Sent metadata to {REMOTE_HOST}:{REMOTE_PORT}")
     except Exception as e:
         print(f"[!] Failed to send metadata: {e}")
+
 
 def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
