@@ -96,9 +96,6 @@ import struct
 def send_metadata(data):
     global last_sent_metadata
 
-    if not data.get("cover_art_file"): # Only send if we have cover art
-        return
-
     # Skip duplicate metadata
     minimal = {k: data.get(k) for k in ("title", "artist", "album")}
     if minimal == last_sent_metadata:
