@@ -97,8 +97,7 @@ def main():
                 else:
                     print(" No image included.")
 
-                print("Metadata:")
-                print(json.dumps(metadata, indent=2))
+                print(metadata["title"])
                 display(metadata)
 
             except Exception as e:
@@ -177,7 +176,6 @@ def display(metadata):
             epd.init_fast()
             epd.display(epd.getbuffer(image))
             epd.sleep()
-            print("Image Displayed")
         except Exception as e:
             print(f"Error: {e}")
             from waveshare_epd import epd7in5_V2 as disp
