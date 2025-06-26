@@ -66,10 +66,6 @@ def main():
 
 
 def validFilePath(path_string: str):
-
-    print("Invalid Image Path")
-    print(path_string)
-
     if (not path_string.endswith(".png")):
         return False
     

@@ -168,8 +168,7 @@ def display(metadata):
 
     image = genImage(metadata)
     image.save("./data/music.png")
-    print(" - Saved image - ")
-    subprocess.run(["python3", "display.py", "./data/music.png"])
+    subprocess.run(["python3", "display.py", "./data/music.png"]) # Run the main script
 
 
 if __name__ == "__main__":
