@@ -3,7 +3,7 @@
     After=network.target
 
     [Service]
-    ExecStart=/home/hayden/EInk-Display/speakerReciever.py
+    ExecStart=/home/hayden/EInk-Display/runReciever.sh
     WorkingDirectory=/home/hayden/EInk-Display
     Restart=always
     User=hayden
