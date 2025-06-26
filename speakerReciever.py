@@ -167,7 +167,7 @@ def display(metadata):
     load_dotenv()  # Load environment variables from .env
 
     image = genImage(metadata)
-    image = image.save("./data/music.png")
+    image.save("./data/music.png")
     print(" - Saved image - ")
     subprocess.run(["python3", "display.py", "./data/music.png"])
 
