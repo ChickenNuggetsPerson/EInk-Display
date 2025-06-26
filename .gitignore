@@ -1,6 +1,6 @@
 lib/
 bin/
-out.jpg
+/out.jpg
 graph.png
 .cache.sqlite
 data/*
