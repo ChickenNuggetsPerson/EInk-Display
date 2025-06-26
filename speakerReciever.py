@@ -106,6 +106,28 @@ def main():
                 traceback.print_exc()
 
 
+def clipText(text: str, maxChars):
+    if (len(text) > maxChars):
+        return text[0:(maxChars - 3)] + "..."
+    return text
+
+def wrapText(text: str, maxChars):
+    currentStr = ""
+    strs = []
+
+    for word in text.split(" "):
+        if (len(currentStr) + len(word) > maxChars):
+            strs.append(currentStr.strip())
+            currentStr = ""
+        
+        currentStr += " " + word
+    
+    if (currentStr.strip() != ""):
+        strs.append(currentStr.strip())
+
+    return strs
+
+
 def genImage(metadata):
 
     width = 800
@@ -131,10 +153,11 @@ def genImage(metadata):
     rightLeadingStart = width - rightSideWidth
     rightSideCenter = int(rightSideWidth / 2) + rightLeadingStart
 
-    draw.text((rightSideCenter, 100), "Now Playing:", "black", Smono, anchor="mb")
-    draw.text((rightSideCenter, 170), metadata["title"], "black", Mfont, anchor="mb")
-    draw.text((rightSideCenter, 220), metadata["artist"], "black", Smono, anchor="mb")
-    draw.text((rightSideCenter, 350), metadata["album"], "black", subSubFont, anchor="mb")
+    draw.text((rightSideCenter, 50), "Now Playing:", "black", Smono, anchor="mb")
+    draw.text((rightSideCenter, 240), clipText(metadata["title"], 40), "black", Mfont, anchor="mb")
+    
+    for i, line in enumerate(wrapText(metadata["artist"], 42)):
+        draw.text((rightSideCenter, 290 + (i * 30)), line, "black", Mmono, anchor="mb")
 
     return Himage
 
