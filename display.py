@@ -44,9 +44,9 @@ def main():
 
     image = None
 
-    if (len(sys.argv) > 0):
-        if (validFilePath(sys.argv[0])):
-            image = Image.open(sys.argv[0])
+    if (len(sys.argv) > 1):
+        if (validFilePath(sys.argv[1])):
+            image = Image.open(sys.argv[1])
             image = image.convert("1")
         else:
             image = genImage()
