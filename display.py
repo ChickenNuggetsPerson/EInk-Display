@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import traceback
 from zoneinfo import ZoneInfo
 from PIL import Image, ImageDraw, ImageFont
 
@@ -366,6 +367,7 @@ try:
     main()
 except Exception as e:
     print(f"Error: {e}")
+    traceback.print_exc()
     from waveshare_epd import epd7in5_V2 as disp
     disp.epdconfig.module_exit()
     sys.exit()
