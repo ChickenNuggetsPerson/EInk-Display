@@ -93,6 +93,8 @@ def send_metadata(data):
         json_payload = json.dumps(data, ensure_ascii=False).encode('utf-8')
         json_len = struct.pack('>I', len(json_payload))  # 4-byte big endian
 
+        print(json_payload)
+
         with socket.create_connection((REMOTE_HOST, REMOTE_PORT), timeout=2) as sock:
             sock.sendall(json_len)
             sock.sendall(json_payload)
