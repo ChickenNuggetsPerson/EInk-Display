@@ -73,11 +73,14 @@ import struct
 def send_metadata(data):
     try:
 
-        global prevData
-        if data["title"] == prevData["title"] and data["artist"] == prevData["artist"] and data["album"] == prevData["album"]:
-            return
-        else:
-            prevData = data
+        try: 
+            global prevData
+            if data["title"] == prevData["title"] and data["artist"] == prevData["artist"] and data["album"] == prevData["album"]:
+                return
+            else:
+                prevData = data
+        except:
+            pass
 
         cover_path = data.get("cover_art_file")
         image_data = b''
