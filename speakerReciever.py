@@ -108,18 +108,33 @@ def main():
 
 def genImage(metadata):
 
-    width = 300
-    height = 190
+    width = 800
+    height = 480
 
     Himage = Image.new('1', (width, height), 255)
     draw = ImageDraw.Draw(Himage)
 
-    draw.text((10, 10), metadata["title"], "black", Sfont, anchor="lt")
+    # TODO: Figure out how to wait for cover image to fully load in...
 
-    cover = Image.open("./data/received_covers/cover.jpg")
-    cover = cover.resize((170, 170))
-    cover = cover.convert("1")
-    Himage.paste(cover, ( 120, 10, 290, 180 ))
+    # coverPadding = 10
+    # coverSize = height - int(2 * coverPadding)
+
+    # cover = Image.open("./data/received_covers/cover.jpg")
+    # cover = cover.resize((coverSize, coverSize), resample=Image.Resampling.BILINEAR)
+    # cover = cover.convert("1")
+    # Himage.paste(cover,(coverPadding, coverPadding), cover)
+
+    coverPadding = 0 # TODO: Placeholders
+    coverSize = 0
+
+    rightSideWidth = width - coverSize - (coverPadding * 2)
+    rightLeadingStart = width - rightSideWidth
+    rightSideCenter = int(rightSideWidth / 2) + rightLeadingStart
+
+    draw.text((rightSideCenter, 100), "Now Playing:", "black", Smono, anchor="mb")
+    draw.text((rightSideCenter, 170), metadata["title"], "black", Mfont, anchor="mb")
+    draw.text((rightSideCenter, 220), metadata["artist"], "black", Smono, anchor="mb")
+    draw.text((rightSideCenter, 350), metadata["album"], "black", subSubFont, anchor="mb")
 
     return Himage
 
@@ -136,9 +151,8 @@ def display(metadata):
         try:
             from waveshare_epd import epd7in5_V2 as disp
             epd = disp.EPD()
-            epd.init()
-            epd.init_part()
-            epd.display_Partial(epd.getbuffer(image), 490, 40, int(image.width), int(image.height))
+            epd.init_fast()
+            epd.display(epd.getbuffer(image))
             epd.sleep()
             print("Image Displayed")
         except Exception as e:
