@@ -28,7 +28,7 @@ received_picture = False
 ART_DIR = Path("/tmp/shairport-art")
 ART_DIR.mkdir(parents=True, exist_ok=True)
 
-prevData = None
+prevData = {}
 
 def reset_metadata():
     global metadata, cover_art_data, received_picture
@@ -73,6 +73,7 @@ import struct
 def send_metadata(data):
     try:
 
+        global prevData
         if data == prevData:
             return
         else:
