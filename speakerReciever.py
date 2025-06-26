@@ -153,7 +153,10 @@ def genImage(metadata):
     rightSideCenter = int(rightSideWidth / 2) + rightLeadingStart
 
     draw.text((rightSideCenter, 50), "Now Playing:", "black", Smono, anchor="mb")
-    draw.text((rightSideCenter, 240), clipText(metadata["title"], 40), "black", Mfont, anchor="mb")
+
+    titleTexts = wrapText(metadata["title"], 40)
+    for i, line in enumerate(titleTexts):
+        draw.text((rightSideCenter, 240 - ((len(titleTexts) - 1) - i) * 40 ), line, "black", Mfont, anchor="mb")
     
     for i, line in enumerate(wrapText(metadata["artist"], 42)):
         draw.text((rightSideCenter, 290 + (i * 30)), line, "black", Mmono, anchor="mb")
