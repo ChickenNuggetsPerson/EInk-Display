@@ -176,7 +176,7 @@ def display(metadata):
         try:
             from waveshare_epd import epd7in5_V2 as disp
             epd = disp.EPD()
-            epd.init_fast()
+            epd.init()
             epd.display(epd.getbuffer(image))
             epd.sleep()
         except Exception as e:
