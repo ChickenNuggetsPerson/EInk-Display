@@ -28,8 +28,6 @@ received_picture = False
 ART_DIR = Path("/tmp/shairport-art")
 ART_DIR.mkdir(parents=True, exist_ok=True)
 
-prevData = {}
-
 def reset_metadata():
     global metadata, cover_art_data, received_picture
     metadata = {}
@@ -37,21 +35,29 @@ def reset_metadata():
     received_picture = False
 
 def handle_text_packet(text):
-    for line in text.splitlines():
+    global metadata  # just for clarity
+    lines = text.splitlines()
+    saw_end = False
+
+    for line in lines:
         if line.startswith("ssncmden"):
-            # End of metadata — save and send
-            image_file = save_cover_art() if received_picture else None
-            if image_file:
-                metadata["cover_art_file"] = str(image_file)
-
-            if all(k in metadata for k in ("title", "artist", "album")):
-                send_metadata(metadata)
-
-            reset_metadata()
+            saw_end = True
+            continue  # don't parse further
 
         for prefix, key in FIELD_MAP.items():
             if line.startswith(prefix):
                 metadata[key] = line[len(prefix):].strip()
+
+    if saw_end:
+        image_file = save_cover_art() if received_picture else None
+        if image_file:
+            metadata["cover_art_file"] = str(image_file)
+
+        if all(k in metadata for k in ("title", "artist", "album")):
+            send_metadata(metadata)
+
+        reset_metadata()
+
 
 def handle_binary_packet(data):
     global received_picture, cover_art_data
@@ -72,15 +78,6 @@ def save_cover_art():
 import struct
 def send_metadata(data):
     try:
-
-        try: 
-            global prevData
-            if data["title"] == prevData["title"] and data["artist"] == prevData["artist"] and data["album"] == prevData["album"]:
-                return
-            else:
-                prevData = data
-        except:
-            pass
 
         cover_path = data.get("cover_art_file")
         image_data = b''
