@@ -7,7 +7,6 @@
     WorkingDirectory=/home/hayden/EInk-Display
     Restart=always
     User=hayden
-    Group=your_group
 
     [Install]
     WantedBy=multi-user.target
