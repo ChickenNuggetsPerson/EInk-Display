@@ -28,6 +28,8 @@ received_picture = False
 ART_DIR = Path("/tmp/shairport-art")
 ART_DIR.mkdir(parents=True, exist_ok=True)
 
+prevData = None
+
 def reset_metadata():
     global metadata, cover_art_data, received_picture
     metadata = {}
@@ -70,13 +72,18 @@ def save_cover_art():
 import struct
 def send_metadata(data):
     try:
+
+        if data == prevData:
+            return
+        else:
+            prevData = data
+
         cover_path = data.get("cover_art_file")
         image_data = b''
         if cover_path and os.path.exists(cover_path):
             with open(cover_path, 'rb') as f:
                 image_data = f.read()
-
-        # Remove local image path (optional)
+        # Remove local image path 
         data["cover_art_file"] = os.path.basename(cover_path) if cover_path else None
 
         json_payload = json.dumps(data, ensure_ascii=False).encode('utf-8')
