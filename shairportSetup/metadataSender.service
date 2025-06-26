@@ -1,0 +1,13 @@
+    [Unit]
+    Description=Metadata sender for Shairport Server
+    After=network.target
+
+    [Service]
+    ExecStart=/home/hayden/EInk-Display/shairportSetup/MetadataSender.py
+    WorkingDirectory=/home/hayden/EInk-Display
+    Restart=always
+    User=hayden
+    Group=your_group
+
+    [Install]
+    WantedBy=multi-user.target

@@ -164,8 +164,6 @@ def genImage(metadata):
     return Himage
 
 def display(metadata):
-    load_dotenv()  # Load environment variables from .env
-
     image = genImage(metadata)
     image.save("./data/music.png")
     subprocess.run(["python3", "display.py", "./data/music.png"]) # Run the main script
