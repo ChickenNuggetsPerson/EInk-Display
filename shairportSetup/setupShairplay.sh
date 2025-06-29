@@ -13,7 +13,7 @@ echo Installing Dependencies...
 
 sleep 1
 
-cd
+cd "$HOME"
 
 sudo apt-get update
 sudo apt-get install build-essential git autoconf automake libtool -y
@@ -32,7 +32,7 @@ make
 sudo make install
 sudo ldconfig
 
-cd
+cd "$HOME"
 
 
 echo Downloading and Building NQPTP
@@ -48,7 +48,7 @@ sudo make install
 sudo systemctl enable nqptp
 sudo systemctl start nqptp
 
-cd
+cd "$HOME"
 
 echo Downloading and Installing Shairport Sync
 sleep 2
@@ -78,7 +78,7 @@ echo Compiling Metadata Reciever
 
 sleep 2
 
-cd
+cd "$HOME"
 
 git clone https://github.com/mikebrady/shairport-sync-metadata-reader.git
 
@@ -91,7 +91,7 @@ sudo make install
 
 echo Done compiling and installing metadata reader...
 
-cd
+cd "$HOME"
 
 wget https://raw.githubusercontent.com/ChickenNuggetsPerson/EInk-Display/refs/heads/main/shairportSetup/shairport-sync.conf
 
