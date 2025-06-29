@@ -137,8 +137,16 @@ def main():
                             metadata['title'] = text
                     # Cover art image
                     elif type_code == 'ssnc' and code_code == 'PICT' and metadata is not None:
-                        cover_path = save_cover_image(data_bytes)
-                        metadata['cover'] = cover_path
+                        if data_bytes:
+                            cover_path = save_cover_image(data_bytes)
+                            if cover_path:
+                                print(f"[DEBUG] Cover image saved to {cover_path}", file=sys.stderr)
+                                metadata['cover'] = cover_path
+                            else:
+                                print("[DEBUG] Failed to save cover image", file=sys.stderr)
+                        else:
+                            print("[DEBUG] Received PICT with no data", file=sys.stderr)
+
 
     except Exception as e:
         print(f"Error reading metadata pipe: {e}", file=sys.stderr)
