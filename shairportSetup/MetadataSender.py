@@ -108,9 +108,8 @@ def send_metadata(data):
         cover_path = data.get("cover_art_file")
         image_data = b''
         if cover_path and os.path.exists(cover_path):
-            # with open(cover_path, 'rb') as f:
-            #     image_data = f.read()
-            pass # TODO: Figure out how to wait for image to fully load in
+            with open(cover_path, 'rb') as f:
+                image_data = f.read()
 
         # Clean up the payload for transmission
         data["cover_art_file"] = os.path.basename(cover_path) if cover_path else None
