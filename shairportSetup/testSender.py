@@ -107,6 +107,7 @@ def main():
                     item_data = parse_item_xml(item_buffer)
                     item_buffer = None
                     if item_data is None:
+                        print(f"[DEBUG] Received item: type={item_data['type']}, code={item_data['code']}", file=sys.stderr)
                         continue
 
                     type_code = item_data['type']
