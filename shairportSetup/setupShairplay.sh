@@ -5,7 +5,7 @@ echo ---------------------------
 
 sleep 2
 
-echo Make sure to run with sudo
+echo DO NOT RUN THIS SCRIPT WITH SUDO
 
 sleep 3
 
