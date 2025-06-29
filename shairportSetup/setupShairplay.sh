@@ -94,8 +94,9 @@ echo Done compiling and installing metadata reader...
 cd
 
 wget https://raw.githubusercontent.com/ChickenNuggetsPerson/EInk-Display/refs/heads/main/shairportSetup/shairport-sync.conf
-wget https://raw.githubusercontent.com/ChickenNuggetsPerson/EInk-Display/refs/heads/main/shairportSetup/MetadataSender.py
+
+git clone https://github.com/ChickenNuggetsPerson/EInk-Display.git
 
 echo 
 echo Please copy shairport config file into /etc/shairport-sync.conf
-echo Metadata sender script can be found in the MetadataSender.py file.
+echo Also, make sure to register .service files in the EInk-Display/shairportSetup folder
