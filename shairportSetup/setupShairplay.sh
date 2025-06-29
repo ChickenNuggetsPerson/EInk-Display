@@ -61,7 +61,7 @@ sudo apt install --no-install-recommends build-essential git autoconf automake l
 git clone https://github.com/mikebrady/shairport-sync.git
 cd shairport-sync
 autoreconf -fi
-./configure --sysconfdir=/etc --with-alsa --with-soxr --with-avahi --with-ssl=openssl --with-systemd --with-airplay-2 --with-apple-alac --with-metadata
+./configure --sysconfdir=/etc --with-alsa --with-soxr --with-avahi --with-ssl=openssl --with-systemd --with-airplay-2 --with-apple-alac --with-metadata --with-dbus-interface
 make
 sudo make install
 
