@@ -39,7 +39,7 @@ send_timer = None
 def reset_metadata():
     global metadata, cover_art_data, received_picture
     metadata = {}
-    # cover_art_data = bytearray()
+    cover_art_data = bytearray()
     received_picture = False
 
 def handle_text_packet(text):
@@ -62,7 +62,7 @@ def handle_text_packet(text):
             send_timer.cancel()
 
         # Delay sending to give image time to arrive
-        send_timer = threading.Timer(0.0, delayed_send)
+        send_timer = threading.Timer(0.5, delayed_send)
         send_timer.start()
 
 def delayed_send():
