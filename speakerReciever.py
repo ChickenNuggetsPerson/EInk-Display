@@ -14,7 +14,7 @@ Mfont = ImageFont.truetype('./Dangrek-Regular.ttf', 45, encoding="unic")
 Sfont = ImageFont.truetype('./Dangrek-Regular.ttf', 35, encoding="unic")
 SSmono = ImageFont.truetype('./SourceCodePro-VariableFont_wght.ttf', 18, encoding="unic")
 Smono = ImageFont.truetype('./SourceCodePro-VariableFont_wght.ttf', 20, encoding="unic")
-Mmono = ImageFont.truetype('./SourceCodePro-VariableFont_wght.ttf', 30, encoding="unic")
+Mmono = ImageFont.truetype('./SourceCodePro-VariableFont_wght.ttf', 25, encoding="unic")
 Bmono = ImageFont.truetype('./SourceCodePro-VariableFont_wght.ttf', 40, encoding="unic")
 subFont = ImageFont.truetype('./LexendGiga-VariableFont_wght.ttf', 30, encoding="unic")
 subSubFont = ImageFont.truetype('./LexendGiga-VariableFont_wght.ttf', 20, encoding="unic")
@@ -110,7 +110,7 @@ def clipText(text: str, maxChars):
         return text[0:(maxChars - 3)] + "..."
     return text
 
-def wrapText(text: str, maxChars):
+def wrapText(text: str, maxChars: int, maxLines: int):
     currentStr = ""
     strs = []
 
@@ -124,6 +124,11 @@ def wrapText(text: str, maxChars):
     if (currentStr.strip() != ""):
         strs.append(currentStr.strip())
 
+    if len(strs) > maxLines:
+        strs = strs[0:maxLines]
+        line = strs[len(strs) - 1]
+        strs[len(strs) - 1] = line[0:-3] + "..."
+
     return strs
 
 
@@ -135,31 +140,26 @@ def genImage(metadata):
     Himage = Image.new('1', (width, height), 255)
     draw = ImageDraw.Draw(Himage)
 
-    # TODO: Figure out how to wait for cover image to fully load in...
-
-    # coverPadding = 10
-    # coverSize = height - int(2 * coverPadding)
-
-    # cover = Image.open("./data/received_covers/cover.jpg")
-    # cover = cover.resize((coverSize, coverSize), resample=Image.Resampling.BILINEAR)
-    # cover = cover.convert("1")
-    # Himage.paste(cover,(coverPadding, coverPadding), cover)
-
-    coverPadding = 0 # TODO: Placeholders
-    coverSize = 0
-
-    rightSideWidth = width - coverSize - (coverPadding * 2)
+    rightSideWidth = int(width/2)
     rightLeadingStart = width - rightSideWidth
     rightSideCenter = int(rightSideWidth / 2) + rightLeadingStart
 
     draw.text((rightSideCenter, 50), "Now Playing:", "black", Smono, anchor="mb")
 
-    titleTexts = wrapText(metadata["title"], 40)
+    titleTexts = wrapText(metadata["title"], 24, 4)
     for i, line in enumerate(titleTexts):
-        draw.text((rightSideCenter, 240 - ((len(titleTexts) - 1) - i) * 40 ), line, "black", Mfont, anchor="mb")
+        draw.text((rightSideCenter, 230 - ((len(titleTexts) - 1) - i) * 40 ), line, "black", Sfont, anchor="mb")
     
-    for i, line in enumerate(wrapText(metadata["artist"], 42)):
-        draw.text((rightSideCenter, 290 + (i * 30)), line, "black", Mmono, anchor="mb")
+    for i, line in enumerate(wrapText(metadata["artist"], 24, 5)):
+        draw.text((rightSideCenter, 280 + (i * 30)), line, "black", Mmono, anchor="mb")
+
+    coverPadding = 20
+    coverSize = 370
+    cover = Image.open("./data/received_covers/cover.jpg")
+    cover = cover.resize((coverSize, coverSize), resample=Image.Resampling.NEAREST)
+    cover = cover.convert("1")
+    Himage.paste(cover, (coverPadding, int(height / 2) - int(coverSize / 2)))
+
 
     return Himage
 

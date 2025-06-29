@@ -79,6 +79,7 @@ def delayed_send():
 def handle_binary_packet(data):
     global received_picture, cover_art_data
     if b"ssncPICT" in data:
+        print("image: ")
         offset = data.find(b"ssncPICT") + len(b"ssncPICT")
         chunk = data[offset:]
         cover_art_data.extend(chunk)
@@ -109,7 +110,7 @@ def send_metadata(data):
         image_data = b''
         if cover_path and os.path.exists(cover_path):
             with open(cover_path, 'rb') as f:
-                image_data = f.read()
+                image_data = f.read() # TODO: Make sure the image is fully recived
 
         # Clean up the payload for transmission
         data["cover_art_file"] = os.path.basename(cover_path) if cover_path else None
