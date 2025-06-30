@@ -3,8 +3,7 @@
 import socket
 import json
 import os
-import re
-from datetime import datetime
+import struct
 from pathlib import Path
 
 # Receiver address
@@ -24,98 +23,53 @@ FIELD_MAP = {
     "coreastm": "duration",
 }
 
-metadata = {}
+COVER_ART_DIR = Path("/tmp/shairport-sync/.cache/coverart")
+
 last_sent_metadata = {}
 
-cover_art_data = bytearray()
-received_picture = False
-
-ART_DIR = Path("/tmp/shairport-art")
-ART_DIR.mkdir(parents=True, exist_ok=True)
-
-import threading
-send_timer = None
-
-def reset_metadata():
-    global metadata, cover_art_data, received_picture
-    metadata = {}
-    cover_art_data = bytearray()
-    received_picture = False
+def get_cover_art_path():
+    try:
+        files = list(COVER_ART_DIR.glob("*"))
+        return files[0] if files else None
+    except Exception as e:
+        print(f"[!] Error accessing cover art directory: {e}")
+        return None
 
 def handle_text_packet(text):
-    global metadata, send_timer
+    metadata = {}
 
-    lines = text.splitlines()
-    saw_end = False
-
-    for line in lines:
+    for line in text.splitlines():
         if line.startswith("ssncmden"):
-            saw_end = True
-        else:
-            for prefix, key in FIELD_MAP.items():
-                if line.startswith(prefix):
-                    metadata[key] = line[len(prefix):].strip()
-
-    if saw_end:
-        # Cancel previous timer if still waiting
-        if send_timer and send_timer.is_alive():
-            send_timer.cancel()
-
-        # Delay sending to give image time to arrive
-        send_timer = threading.Timer(0.5, delayed_send)
-        send_timer.start()
-
-def delayed_send():
-    image_file = save_cover_art() if received_picture else None
-    if image_file:
-        metadata["cover_art_file"] = str(image_file)
+            break  # End of metadata group
+        for prefix, key in FIELD_MAP.items():
+            if line.startswith(prefix):
+                metadata[key] = line[len(prefix):].strip()
 
     if all(k in metadata for k in ("title", "artist", "album")):
         send_metadata(metadata)
 
-    reset_metadata()
-
-
-def handle_binary_packet(data):
-    global received_picture, cover_art_data
-    if b"ssncPICT" in data:
-        print("image: ")
-        offset = data.find(b"ssncPICT") + len(b"ssncPICT")
-        chunk = data[offset:]
-        cover_art_data.extend(chunk)
-        received_picture = True
-
-def save_cover_art():
-    if not cover_art_data:
-        return None
-    filename = ART_DIR / f"cover.jpg"
-    with open(filename, 'wb') as f:
-        f.write(cover_art_data)
-    return filename
-
-import struct
-def send_metadata(data):
+def send_metadata(metadata):
     global last_sent_metadata
 
-    # Skip duplicate metadata
-    minimal = {k: data.get(k) for k in ("title", "artist", "album")}
+    # Avoid sending duplicates
+    minimal = {k: metadata.get(k) for k in ("title", "artist", "album")}
     if minimal == last_sent_metadata:
         print("Duplicate metadata — skipping send")
         return
 
     last_sent_metadata = minimal.copy()
 
-    try:
-        cover_path = data.get("cover_art_file")
+    cover_path = get_cover_art_path()
+    if cover_path and cover_path.exists():
+        metadata["cover_art_file"] = cover_path.name
+        with open(cover_path, 'rb') as f:
+            image_data = f.read()
+    else:
+        metadata["cover_art_file"] = None
         image_data = b''
-        if cover_path and os.path.exists(cover_path):
-            with open(cover_path, 'rb') as f:
-                image_data = f.read() # TODO: Make sure the image is fully recived
 
-        # Clean up the payload for transmission
-        data["cover_art_file"] = os.path.basename(cover_path) if cover_path else None
-
-        json_payload = json.dumps(data, ensure_ascii=False).encode('utf-8')
+    try:
+        json_payload = json.dumps(metadata, ensure_ascii=False).encode('utf-8')
         json_len = struct.pack('>I', len(json_payload))
 
         with socket.create_connection((REMOTE_HOST, REMOTE_PORT), timeout=2) as sock:
@@ -123,11 +77,9 @@ def send_metadata(data):
             sock.sendall(json_payload)
             sock.sendall(image_data)
 
-        title = metadata["title"]
-        print(f"Sent metadata to {REMOTE_HOST}:{REMOTE_PORT} - {title}")
+        print(f"Sent metadata to {REMOTE_HOST}:{REMOTE_PORT} - {metadata['title']}")
     except Exception as e:
         print(f"[!] Failed to send metadata: {e}")
-
 
 def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -135,13 +87,13 @@ def main():
     print(f"Listening on UDP port {UDP_PORT}...")
 
     while True:
-        data, addr = sock.recvfrom(65535)
+        data, _ = sock.recvfrom(65535)
 
         try:
             text = data.decode("utf-8")
             handle_text_packet(text)
         except UnicodeDecodeError:
-            handle_binary_packet(data)
+            pass  # Ignore binary packets
 
 if __name__ == "__main__":
     main()
