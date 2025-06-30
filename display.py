@@ -62,10 +62,10 @@ def main():
         from waveshare_epd import epd7in5_V2 as disp
         epd = disp.EPD()
         
-        if (fastMode):
-            epd.init_fast()
-        else: 
-            epd.init()
+        # if (fastMode):
+        #     epd.init_fast()
+        # else: 
+        epd.init()
 
         epd.display(epd.getbuffer(image))
         epd.sleep()
