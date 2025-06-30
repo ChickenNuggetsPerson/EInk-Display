@@ -5,6 +5,7 @@ import json
 import os
 import struct
 from pathlib import Path
+import time
 
 # Receiver address
 REMOTE_HOST = "192.168.51.237"
@@ -26,6 +27,27 @@ FIELD_MAP = {
 COVER_ART_DIR = Path("/tmp/shairport-sync/.cache/coverart")
 
 last_sent_metadata = {}
+
+
+def wait_for_image_stability(path: Path, timeout=2.0, interval=0.1):
+    start_time = time.time()
+    last_size = -1
+
+    while time.time() - start_time < timeout:
+        if not path.exists():
+            time.sleep(interval)
+            continue
+
+        current_size = path.stat().st_size
+        if current_size == last_size and current_size > 0:
+            return True  # Stable and non-empty
+
+        last_size = current_size
+        time.sleep(interval)
+
+    print("[!] Timeout waiting for image to stabilize")
+    return False
+
 
 def get_cover_art_path():
     try:
@@ -51,7 +73,6 @@ def handle_text_packet(text):
 def send_metadata(metadata):
     global last_sent_metadata
 
-    # Avoid sending duplicates
     minimal = {k: metadata.get(k) for k in ("title", "artist", "album")}
     if minimal == last_sent_metadata:
         print("Duplicate metadata — skipping send")
@@ -60,13 +81,17 @@ def send_metadata(metadata):
     last_sent_metadata = minimal.copy()
 
     cover_path = get_cover_art_path()
-    if cover_path and cover_path.exists():
-        metadata["cover_art_file"] = cover_path.name
-        with open(cover_path, 'rb') as f:
-            image_data = f.read()
+    image_data = b''
+
+    if cover_path:
+        if wait_for_image_stability(cover_path):
+            metadata["cover_art_file"] = cover_path.name
+            with open(cover_path, 'rb') as f:
+                image_data = f.read()
+        else:
+            metadata["cover_art_file"] = None
     else:
         metadata["cover_art_file"] = None
-        image_data = b''
 
     try:
         json_payload = json.dumps(metadata, ensure_ascii=False).encode('utf-8')
@@ -80,6 +105,7 @@ def send_metadata(metadata):
         print(f"Sent metadata to {REMOTE_HOST}:{REMOTE_PORT} - {metadata['title']}")
     except Exception as e:
         print(f"[!] Failed to send metadata: {e}")
+
 
 def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
