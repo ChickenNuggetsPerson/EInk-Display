@@ -160,7 +160,7 @@ def genImage(metadata):
 
     mask = Image.new('L', (coverSize, coverSize), 0)
     maskDraw = ImageDraw.Draw(mask)
-    draw.rounded_rectangle((0, 0, coverSize, coverSize), radius=radius, fill=255) 
+    maskDraw.rounded_rectangle((0, 0, coverSize, coverSize), radius=radius, fill=255) 
 
     cover = Image.open("./data/received_covers/cover.jpg")
     cover = cover.resize((coverSize, coverSize), resample=Image.Resampling.NEAREST)

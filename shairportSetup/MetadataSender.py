@@ -8,8 +8,8 @@ import time
 from pathlib import Path
 
 # Receiver address
-REMOTE_HOST = "192.168.51.237"
-# REMOTE_HOST = "192.168.51.24"
+# REMOTE_HOST = "192.168.51.237"
+REMOTE_HOST = "192.168.51.24"
 REMOTE_PORT = 6000
 
 UDP_IP = "0.0.0.0"
