@@ -153,12 +153,19 @@ def genImage(metadata):
     for i, line in enumerate(wrapText(metadata["artist"], 24, 5)):
         draw.text((rightSideCenter, 280 + (i * 30)), line, "black", Mmono, anchor="mb")
 
+
     coverPadding = 20
     coverSize = 370
+    radius = 15
+
+    mask = Image.new('L', (coverSize, coverSize), 0)
+    maskDraw = ImageDraw.Draw(mask)
+    draw.rounded_rectangle((0, 0, coverSize, coverSize), radius=radius, fill=255) 
+
     cover = Image.open("./data/received_covers/cover.jpg")
     cover = cover.resize((coverSize, coverSize), resample=Image.Resampling.NEAREST)
     cover = cover.convert("1")
-    Himage.paste(cover, (coverPadding, int(height / 2) - int(coverSize / 2)))
+    Himage.paste(cover, (coverPadding, int(height / 2) - int(coverSize / 2)), mask)
 
 
     return Himage
