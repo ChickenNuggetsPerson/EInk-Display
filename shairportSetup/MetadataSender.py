@@ -26,6 +26,7 @@ FIELD_MAP = {
 
 COVER_ART_DIR = Path("/tmp/shairport-sync/.cache/coverart")
 last_sent_metadata = {}
+metadata = {}
 
 def get_cover_art_path():
     try:
@@ -36,8 +37,7 @@ def get_cover_art_path():
         return None
 
 def handle_text_packet(text):
-    metadata = {}
-    print(text)
+    global metadata
 
     for line in text.splitlines():
         if line.startswith("ssncmden"):
@@ -49,6 +49,7 @@ def handle_text_packet(text):
     if all(k in metadata for k in ("title", "artist", "album")):
         # time.sleep(0.5)  # Allow image file to be written
         send_metadata(metadata)
+        metadata = {}
 
 def send_metadata(metadata):
     global last_sent_metadata
