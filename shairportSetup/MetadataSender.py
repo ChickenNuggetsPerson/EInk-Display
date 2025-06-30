@@ -37,6 +37,7 @@ def get_cover_art_path():
 
 def handle_text_packet(text):
     metadata = {}
+    print(text)
 
     for line in text.splitlines():
         if line.startswith("ssncmden"):
