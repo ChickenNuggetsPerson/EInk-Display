@@ -31,7 +31,10 @@ metadata = {}
 def get_cover_art_path():
     try:
         files = list(COVER_ART_DIR.glob("*"))
-        return files[0] if files else None
+        if not files:
+            return None
+        most_recent_file = max(files, key=lambda f: f.stat().st_mtime)
+        return most_recent_file
     except Exception as e:
         print(f"[!] Error accessing cover art directory: {e}")
         return None
