@@ -46,7 +46,7 @@ def handle_text_packet(text):
                 metadata[key] = line[len(prefix):].strip()
 
     if all(k in metadata for k in ("title", "artist", "album")):
-        time.sleep(0.5)  # Allow image file to be written
+        # time.sleep(0.5)  # Allow image file to be written
         send_metadata(metadata)
 
 def send_metadata(metadata):
