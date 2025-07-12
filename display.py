@@ -176,8 +176,15 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
     dx = 800 / 6
     shift = dx / 2
 
+    offset = 0
+
+    now = datetime.now()
+    if (now.hour >= 21 or now.hour <= 5):
+        offset = 1
+    
+
     index = -1
-    for hour in data[:6]: # Only do the next 6 hours
+    for hour in data[offset:6+offset]: # Only do the next 6 hours
         index += 1
 
         time = datetime.fromisoformat(hour["DateTime"])
@@ -200,6 +207,31 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
             if (prob >= 10):
                 draw.text((index * dx + shift, yPos + 160), f"{prob}%", "black", SSmono, anchor="mm")
             
+
+    if (offset == 0):
+        return
+
+    current = data[0]
+
+    draw.rounded_rectangle((430, 20, 770, 270), radius=15, fill="white", outline="black")
+
+    draw.text((600, 30), "Current Weather:", "black", Sfont, anchor="mt")
+    draw.line((470, 60, 730, 60), fill="black", width=1)
+    
+    draw.text((600, 200), current["IconPhrase"], "black", subFont, anchor="mt")
+    temp = current["Temperature"]["Value"]
+    temp = f"{temp}°"
+    if (current["PrecipitationProbability"]):
+        prob = current["PrecipitationProbability"]
+        if (prob >= 10):
+            temp = temp + f" - {prob}%"
+
+    draw.text((600, 240), temp, "black", subSubFont, anchor="mt")
+
+    icon = getWeatherIcon(current["WeatherIcon"], current["IsDaylight"])
+    size = 110
+    pasteIcon(image, icon, 600, 125, size, size)
+
 
 def get_local_ip():
     import socket
