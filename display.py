@@ -43,13 +43,11 @@ def main():
     load_dotenv()  # Load environment variables from .env
 
     image = None
-    fastMode = False
 
     if (len(sys.argv) > 1):
         if (validFilePath(sys.argv[1])):
             image = Image.open(sys.argv[1])
             image = image.convert("1")
-            fastMode = True
         else:
             image = genImage()
     else:
@@ -86,32 +84,42 @@ def validFilePath(path_string: str):
 
 def genImage(width=800, height=480):
     Himage = Image.new('1', (width, height), 255)
-
-    drawRandImage = False
-
-    if drawRandImage:
-        Himage = fetchRandomImage()
-
     draw = ImageDraw.Draw(Himage)
     
     now = datetime.now()
-
-    if (not drawRandImage):
-        getCalendar(draw)
-        getWeather(draw, Himage)
-        getNetwork(draw)
-    
-        day_name = now.strftime("%A")  # Full weekday name
-        date_str = now.strftime("%B %d, %Y")
-
-        SSmono.set_variation_by_name("ExtraLight")
-
-        draw.rounded_rectangle((5, 20, 10 + len(day_name) * 55, 120), radius=10, fill="white")
-        draw.text((15, 80), day_name, 'black', subFont)
-        draw.text((10, 0), date_str, 'black', Bfont)
-        draw.line((10, 120, 300, 120), fill='black', width=2)
-
+    day_name = now.strftime("%A")  # Full weekday name
+    date_str = now.strftime("%B %d, %Y")
     time_str = now.strftime("%I:%M %p")
+
+    if len(sys.argv) > 1:
+        if (sys.argv[1] == "rebooted"):
+
+            draw.rounded_rectangle((100, 100, 700, 380), radius=15, fill="white", outline="black")
+            draw.text((400, 140), "System Rebooted", 'black', Bfont, anchor="mm")
+            draw.line((150, 170, 650, 170), fill="black", width=2)
+
+            draw.text((400, 200), date_str, 'black', subSubFont, anchor="mm")
+            draw.text((400, 230), time_str, 'black', subSubFont, anchor="mm")
+
+            ip = get_local_ip()
+            ssid = get_ssid()
+
+            draw.text((400, 300), f"SSID:   {ssid}", "black", subSubFont, anchor="mm")
+            draw.text((400, 330), f"IP:     {ip}", "black", subSubFont, anchor="mm")
+
+            return Himage
+
+    getCalendar(draw)
+    getWeather(draw, Himage)
+    getNetwork(draw)
+
+    SSmono.set_variation_by_name("ExtraLight")
+
+    draw.rounded_rectangle((5, 20, 10 + len(day_name) * 55, 120), radius=10, fill="white")
+    draw.text((15, 80), day_name, 'black', subFont)
+    draw.text((10, 0), date_str, 'black', Bfont)
+    draw.line((10, 120, 300, 120), fill='black', width=2)
+
     draw.text((798, 2), time_str, 'black', SSmono, anchor="rt")
 
     return Himage
@@ -389,15 +397,6 @@ def getWeatherIcon(icon_code, isDaylight):
         name = "fog.png"
 
     return Image.open(f"icons/pngs/{name}")
-
-def fetchRandomImage(): 
-    response = requests.get("https://picsum.photos/800/480")
-    with open("data/image.png", "wb") as f:
-        f.write(response.content)
-
-    image = Image.open("data/image.png").convert("L", dither=Image.Dither.FLOYDSTEINBERG)  # Convert to grayscale
-    image = image.convert("1")
-    return image
 
 
 
