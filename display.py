@@ -109,8 +109,13 @@ def genImage(width=800, height=480):
 
             return Himage
 
-    getCalendar(draw)
-    getWeather(draw, Himage)
+    # if (now.hour >= 21 or now.hour <= 5):
+    #     getWeather(draw, Himage, True)
+    # else:
+    #     getCalendar(draw)
+    #     getWeather(draw, Himage, False)
+
+    getWeather(draw, Himage, True)
     getNetwork(draw)
 
     SSmono.set_variation_by_name("ExtraLight")
@@ -139,7 +144,7 @@ def fetchLocationData():
             "data": apiData
         }, f, indent=4)
 
-def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
+def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
     
     yPos = 300
 
@@ -185,9 +190,7 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image):
     shift = dx / 2
 
     offset = 0
-
-    now = datetime.now()
-    if (now.hour >= 21 or now.hour <= 5):
+    if (includeNow):
         offset = 1
     
 
