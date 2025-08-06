@@ -109,18 +109,12 @@ def genImage(width=800, height=480):
 
             return Himage
 
-    # if (now.hour >= 21 or now.hour <= 5):
-    #     getWeather(draw, Himage, True)
-    # else:
-    #     getCalendar(draw)
-    #     getWeather(draw, Himage, False)
-
     getWeather(draw, Himage, True)
     getNetwork(draw)
 
     SSmono.set_variation_by_name("ExtraLight")
+    subFont.set_variation_by_name("Bold")
 
-    draw.rounded_rectangle((5, 20, 10 + len(day_name) * 55, 120), radius=10, fill="white")
     draw.text((15, 80), day_name, 'black', subFont)
     draw.text((10, 0), date_str, 'black', Bfont)
     draw.line((10, 120, 300, 120), fill='black', width=2)
@@ -229,7 +223,13 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
     draw.text((600, 30), "Current Weather:", "black", Sfont, anchor="mt")
     draw.line((470, 60, 730, 60), fill="black", width=1)
     
-    draw.text((600, 200), current["IconPhrase"], "black", subFont, anchor="mt")
+    lines = wrapText(current["IconPhrase"], 16, 2)
+    subFont.set_variation_by_name("Bold")
+
+    for i, line in enumerate(lines):
+        draw.text((600, 190 + i * 30 - (len(lines) - 1) * 15 ), line.capitalize(), "black", subFont, anchor="mt")
+
+
     temp = current["Temperature"]["Value"]
     temp = f"{temp}°"
     if (current["PrecipitationProbability"]):
@@ -237,11 +237,11 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
         if (prob >= 10):
             temp = temp + f" - {prob}%"
 
-    draw.text((600, 240), temp, "black", subSubFont, anchor="mt")
+    draw.text((600, 250), temp, "black", subSubFont, anchor="mt")
 
     icon = getWeatherIcon(current["WeatherIcon"], current["IsDaylight"])
     size = 110
-    pasteIcon(image, icon, 600, 125, size, size)
+    pasteIcon(image, icon, 600, 120, size, size)
 
 
 def get_local_ip():
@@ -400,6 +400,28 @@ def getWeatherIcon(icon_code, isDaylight):
         name = "fog.png"
 
     return Image.open(f"icons/pngs/{name}")
+
+
+def wrapText(text: str, maxChars: int, maxLines: int):
+    currentStr = ""
+    strs = [] 
+
+    for word in text.split(" "):
+        if (len(currentStr) + len(word) > maxChars):
+            strs.append(currentStr.strip())
+            currentStr = ""
+        
+        currentStr += " " + word
+    
+    if (currentStr.strip() != ""):
+        strs.append(currentStr.strip())
+
+    if len(strs) > maxLines:
+        strs = strs[0:maxLines]
+        line = strs[len(strs) - 1]
+        strs[len(strs) - 1] = line + "..."
+
+    return strs
 
 
 
