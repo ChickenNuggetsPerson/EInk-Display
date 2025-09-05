@@ -115,9 +115,9 @@ def genImage(width=800, height=480):
     SSmono.set_variation_by_name("ExtraLight")
     subFont.set_variation_by_name("Bold")
 
-    draw.text((15, 80), day_name, 'black', subFont)
-    draw.text((10, 0), date_str, 'black', Bfont)
-    draw.line((10, 120, 300, 120), fill='black', width=2)
+    draw.text((15, 70), day_name, 'black', subFont)
+    draw.text((10, 0), date_str, 'black', ImageFont.truetype('./Dangrek-Regular.ttf', 48, encoding="unic"))
+    draw.line((10, 110, 300, 110), fill='black', width=2)
 
     draw.text((798, 2), time_str, 'black', SSmono, anchor="rt")
 
