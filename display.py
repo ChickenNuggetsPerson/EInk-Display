@@ -167,7 +167,7 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
 
     offset = 0
     if (includeNow):
-        offset = 1
+        offset = 3
     
 
     index = -1
@@ -198,7 +198,7 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
     if (offset == 0):
         return
 
-    current = periods[0]
+    current = periods[2]
 
     draw.rounded_rectangle((430, 20, 770, 270), radius=15, fill="white", outline="black")
 
