@@ -38,6 +38,9 @@ import requests
 
 # logging.basicConfig(level=logging.DEBUG)
 
+# Get GridPoint key https://api.weather.gov/points/{long},{lat}
+
+
 def main():
 
     load_dotenv()  # Load environment variables from .env
@@ -124,20 +127,6 @@ def genImage(width=800, height=480):
     return Himage
 
 
-def fetchLocationData():
-
-    print("Location Key Changed, Fetching New Location Data")
-    apiKey = os.getenv("ACCUWEATHER_API_KEY")
-    locationKey = os.getenv("ACCUWEATHER_LOCATION_KEY")
-    url = f"http://dataservice.accuweather.com/locations/v1/{locationKey}?apikey={apiKey}"
-
-    apiData = requests.get(url).json()
-    with open("data/location.json", "w") as f:
-        json.dump({
-            "for": locationKey,
-            "data": apiData
-        }, f, indent=4)
-
 def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
     
     yPos = 300
@@ -146,9 +135,10 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
         try:
             print("Fetching Weather")
 
-            apiKey = os.getenv("ACCUWEATHER_API_KEY")
-            locationKey = os.getenv("ACCUWEATHER_LOCATION_KEY")
-            url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/{locationKey}?apikey={apiKey}"
+            office = os.getenv("WEATHER_FORECAST_OFFICE")
+            gridX = os.getenv("WEATHER_GRID_X")
+            gridY = os.getenv("WEATHER_GRID_Y")
+            url = f"https://api.weather.gov/gridpoints/{office}/{gridX},{gridY}/forecast/hourly"
 
             apiData = requests.get(url).json()
 
@@ -161,21 +151,13 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
         print("Skipping Weather Fetch")
 
 
-    # Read location file
-    location = readJSON("data/location.json")
-    if (location is None):
-        fetchLocationData()
-        location = readJSON("data/location.json")
-    else:
-        if (location["for"] != os.getenv("ACCUWEATHER_LOCATION_KEY")):
-            fetchLocationData()
-            location = readJSON("data/location.json")
+    
+    locationName = os.getenv("WEATHER_LOCATION_NAME")
 
     # Read file
     data = readJSON("data/data.json")
+    periods = data["properties"]["periods"]
     
-
-    locationName = location["data"]["LocalizedName"] + ", " + location["data"]["AdministrativeArea"]["LocalizedName"]
     draw.text((25, yPos - 35), locationName, "black", subSubFont, anchor="lb")
     draw.line((20, yPos - 30, 25 + len(locationName) * 15, yPos - 30), fill="black", width=1)
 
@@ -189,25 +171,25 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
     
 
     index = -1
-    for hour in data[offset:6+offset]: # Only do the next 6 hours
+    for hour in periods[offset:6+offset]: # Only do the next 6 hours
         index += 1
 
-        time = datetime.fromisoformat(hour["DateTime"])
+        time = datetime.fromisoformat(hour["startTime"])
         timestr = time.strftime("%l %p").strip()
         draw.text((index * dx + shift, yPos), timestr, "black", subSubFont, anchor="mm")
 
-        icon = getWeatherIcon(hour["WeatherIcon"], hour["IsDaylight"])
+        icon = getWeatherIcon(hour["icon"])
         size = 100 # - (index * 5)
         pasteIcon(image, icon, index * dx + 65, yPos + 70, size, size)
 
-        temp = hour["Temperature"]["Value"]
+        temp = hour["temperature"]
         draw.text((index * dx + shift, yPos + 141 ), f"{temp}°", "black", SSmono, anchor="mm")
 
         if (index != 0):
             draw.line((index * dx, yPos + 5, index * dx, yPos + 145), fill="black", width=1)
 
-        if (hour["PrecipitationProbability"]):
-            prob = hour["PrecipitationProbability"]
+        if (hour["probabilityOfPrecipitation"]["value"]):
+            prob = hour["probabilityOfPrecipitation"]["value"]
 
             if (prob >= 10):
                 draw.text((index * dx + shift, yPos + 160), f"{prob}%", "black", SSmono, anchor="mm")
@@ -216,30 +198,35 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
     if (offset == 0):
         return
 
-    current = data[0]
+    current = periods[0]
 
     draw.rounded_rectangle((430, 20, 770, 270), radius=15, fill="white", outline="black")
 
     draw.text((600, 30), "Current Weather:", "black", Sfont, anchor="mt")
     draw.line((470, 60, 730, 60), fill="black", width=1)
     
-    lines = wrapText(current["IconPhrase"], 16, 2)
-    subFont.set_variation_by_name("Bold")
+    lines = wrapText(current["shortForecast"], 22, 2)
 
     for i, line in enumerate(lines):
-        draw.text((600, 190 + i * 30 - (len(lines) - 1) * 15 ), line.capitalize(), "black", subFont, anchor="mt")
+        draw.text(
+            (600, 195 + i * 30 - (len(lines) - 1) * 15 ), 
+            line, 
+            "black", 
+            ImageFont.truetype('./LexendGiga-VariableFont_wght.ttf', 20, encoding="unic"), 
+            anchor="mt"
+        )
 
 
-    temp = current["Temperature"]["Value"]
+    temp = current["temperature"]
     temp = f"{temp}°"
-    if (current["PrecipitationProbability"]):
-        prob = current["PrecipitationProbability"]
+    if (current["probabilityOfPrecipitation"]):
+        prob = current["probabilityOfPrecipitation"]["value"]
         if (prob >= 10):
             temp = temp + f" - {prob}%"
 
     draw.text((600, 250), temp, "black", subSubFont, anchor="mt")
 
-    icon = getWeatherIcon(current["WeatherIcon"], current["IsDaylight"])
+    icon = getWeatherIcon(current["icon"])
     size = 110
     pasteIcon(image, icon, 600, 120, size, size)
 
@@ -354,53 +341,65 @@ def readJSON(file_path):
     except json.JSONDecodeError:
         print(f"Error: Invalid JSON format in: {file_path}")
         return None
-def getWeatherIcon(icon_code, isDaylight):
-    name = ""
+
+
+
+NOAA_ICON_MAP = {
+    "skc": "sunny.png",
+    "few": "cloudy_partial.png",
+    "sct": "cloudy_partial.png",
+    "bkn": "cloudy.png",
+    "ovc": "cloudy.png",
+    "wind_skc": "wind.png",
+    "wind_few": "wind.png",
+    "wind_sct": "wind.png",
+    "wind_bkn": "wind.png",
+    "wind_ovc": "wind.png",
+    "snow": "snow.png",
+    "rain_snow": "snow.png",
+    "rain_sleet": "snow.png",
+    "snow_sleet": "snow.png",
+    "fzra": "rain.png",
+    "rain_fzra": "rain.png",
+    "snow_fzra": "snow.png",
+    "sleet": "snow.png",
+    "rain": "rain.png",
+    "rain_showers": "rain_partial.png",
+    "rain_showers_hi": "rain_partial.png",
+    "tsra": "thunder.png",
+    "tsra_sct": "thunder.png",
+    "tsra_hi": "thunder.png",
+    "tornado": "thunder.png",
+    "hurricane": "wind.png",
+    "tropical_storm": "wind.png",
+    "dust": "fog.png",
+    "smoke": "fog.png",
+    "haze": "fog.png",
+    "hot": "sunny.png",
+    "cold": "snow.png",
+    "blizzard": "snow.png",
+    "fog": "fog.png",
+}
+
+def getWeatherIcon(icon_url):
+    path = icon_url.split("icons/")[1].split("?")[0]   # e.g. "land/night/tsra_hi"
+    parts = path.split("/")
     
-    if icon_code in [1, 2, 3, 30]: 
-        name = "sunny.png"
+    tod = parts[1]       # "day" or "night"
+    condition = parts[2] # e.g. "tsra_hi"
 
-    elif icon_code in [33, 34, 35]:
-        name = "night.png"
+    icon = NOAA_ICON_MAP.get(condition, "fog.png")
 
-    elif icon_code in [4, 5, 6, 36, 37, 38]:  # Partly Cloudy
-        
-        if isDaylight:
-            name = "cloudy_partial.png"
-        else:
-            name = "cloudy_partial_night.png"
+    # swap to night version if needed
+    if tod == "night":
+        if icon == "sunny.png":
+            icon = "night.png"
+        elif icon == "cloudy_partial.png":
+            icon = "cloudy_partial_night.png"
+        elif icon == "rain_partial.png":
+            icon = "rain_partial_night.png"
 
-    elif icon_code in [39, 40]:  # Partial Rain
-
-        if isDaylight:
-            name = "rain_partial.png"
-        else:
-            name = "rain_partial_night.png"
-
-    elif icon_code in [7, 8]:  # Cloudy
-        name = "cloudy.png"
-
-    elif icon_code in [11]: # Fog
-        name = "fog.png"
-
-    elif icon_code in [12, 13, 14, 18]:  # Rain
-        name = "rain.png"
-
-    elif icon_code in [15, 16, 17, 41, 42]:  # Thunderstorms
-        name = "thunder.png"
-
-    elif icon_code in [19, 20, 21, 22, 23, 24, 25, 26, 29, 31, 43, 44]:  # Snow
-        name = "snow.png"
-
-    elif icon_code in [32]:  # Snow
-        name = "wind.png"
-
-    else:
-        print("Code:", icon_code)
-        name = "fog.png"
-
-    return Image.open(f"icons/pngs/{name}")
-
+    return Image.open(f"icons/pngs/{icon}")
 
 def wrapText(text: str, maxChars: int, maxLines: int):
     currentStr = ""
