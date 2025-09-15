@@ -165,9 +165,19 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
     dx = 800 / 6
     shift = dx / 2
 
+    # Calculate the offset
     offset = 0
+
+    now = datetime.now()
+    for (i, period) in enumerate(periods):
+        time = datetime.fromisoformat(period["startTime"])
+        if (time.timestamp() > now.timestamp()):
+            offset = i
+            break
+
+    
     if (includeNow):
-        offset = 3
+        offset += 1
     
 
     index = -1
@@ -195,10 +205,14 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
                 draw.text((index * dx + shift, yPos + 160), f"{prob}%", "black", SSmono, anchor="mm")
             
 
-    if (offset == 0):
+    updateTime = datetime.fromisoformat(data["properties"]["updateTime"])
+    updateTimeString = updateTime.astimezone().strftime("Weather Updated: %I:%M %p")
+    draw.text((5, 475), updateTimeString, 'black', SSmono, anchor="lb")
+
+    if (not includeNow):
         return
 
-    current = periods[2]
+    current = periods[offset - 1]
 
     draw.rounded_rectangle((430, 20, 770, 270), radius=15, fill="white", outline="black")
 
@@ -217,6 +231,9 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
         )
 
 
+    time    = datetime.fromisoformat(current["startTime"])
+    timestr = time.strftime("%l %p").strip()
+    
     temp = current["temperature"]
     temp = f"{temp}°"
     if (current["probabilityOfPrecipitation"]):
@@ -224,7 +241,7 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
         if (prob >= 10):
             temp = temp + f" - {prob}%"
 
-    draw.text((600, 250), temp, "black", subSubFont, anchor="mt")
+    draw.text((600, 250), f"{timestr} - {temp}", "black", subSubFont, anchor="mt")
 
     icon = getWeatherIcon(current["icon"])
     size = 110
