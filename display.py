@@ -207,7 +207,7 @@ def getWeather(draw: ImageDraw.ImageDraw, image: Image.Image, includeNow: bool):
 
     updateTime = datetime.fromisoformat(data["properties"]["updateTime"])
     updateTimeString = updateTime.astimezone().strftime("Weather Updated: %I:%M %p")
-    draw.text((5, 475), updateTimeString, 'black', SSmono, anchor="lb")
+    draw.text((20, 205), updateTimeString, 'black', SSmono, anchor="lb")
 
     if (not includeNow):
         return
@@ -395,7 +395,7 @@ NOAA_ICON_MAP = {
     "hot": "sunny.png",
     "cold": "snow.png",
     "blizzard": "snow.png",
-    "fog": "fog.png",
+    "fog": "cloudy.png",
 }
 
 def getWeatherIcon(icon_url):
@@ -403,9 +403,12 @@ def getWeatherIcon(icon_url):
     parts = path.split("/")
     
     tod = parts[1]       # "day" or "night"
-    condition = parts[2] # e.g. "tsra_hi"
+    condition = parts[2].split(",")[0] # e.g. "tsra_hi"
 
-    icon = NOAA_ICON_MAP.get(condition, "fog.png")
+    icon = NOAA_ICON_MAP.get(condition, "error")
+
+    if icon == "error":
+        return Image.new('1', (200, 200), 0)
 
     # swap to night version if needed
     if tod == "night":
