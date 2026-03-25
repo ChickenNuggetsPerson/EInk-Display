@@ -99,7 +99,7 @@ def getRandomImage():
         shutil.rmtree("./data/images")
     except Exception as e:
         print(e)
-        return ""
+        # return ""
     
     os.mkdir("./data/images")
     
